@@ -3,7 +3,16 @@ import { apiHandler } from '@/lib/apiHandler';
 import { ApiError } from '@/lib/errors';
 import User from '@/models/User';
 import Company from '@/models/Company';
-import { signJwt, setAuthCookie } from '@/lib/auth';
+import * as jose from 'jose';
+
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
+
+async function signJwtJose(payload) {
+  return await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('7d')
+    .sign(JWT_SECRET);
+}
 
 async function handler(request) {
   const body = await request.json();
@@ -50,7 +59,7 @@ async function handler(request) {
     ? user.companyId 
     : user.companyId.toString();
 
-  const token = signJwt({
+  const token = await signJwtJose({
     sub: user._id.toString(),
     role: user.role,
     companyId: finalCompanyId,
@@ -69,14 +78,10 @@ async function handler(request) {
     },
   });
 
-  // Set cookie using Next.js cookies API
-  response.cookies.set('auth_token', token, {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'lax', // Changed to lax for better compatibility with redirects
-    maxAge: 60 * 60 * 24 * 7, // 7 days
-    path: '/',
-  });
+  // IMPORTANT: Next.js 15 has issues with response.cookies.set()
+  // Use manual Set-Cookie header instead
+  const cookieValue = `auth_token=${token}; HttpOnly; Path=/; Max-Age=604800; SameSite=Lax`;
+  response.headers.set('Set-Cookie', cookieValue);
 
   return response;
 }
