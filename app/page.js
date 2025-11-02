@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '@/components/layout/Navbar';
-import Sidebar from '@/components/layout/Sidebar';
 import Card from '@/components/ui/Card';
 import PhaseCostBarChart from '@/components/charts/PhaseCostBarChart';
 import TopItemsBarChart from '@/components/charts/TopItemsBarChart';
@@ -93,48 +91,44 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Navbar />
-        <main className="flex-1 p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Dashboard</h2>
-            <div className="flex items-center gap-4">
-              <select
-                value={selectedProject || ''}
-                onChange={(e) => setSelectedProject(e.target.value || null)}
-                className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All Projects</option>
-                {projects.map((project) => (
-                  <option key={project._id} value={project._id}>
-                    {project.name}
-                  </option>
-                ))}
-              </select>
-              {selectedProject && (
-                <button
-                  onClick={() => setSelectedProject(null)}
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  Clear Filter
-                </button>
-              )}
-            </div>
-          </div>
-
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
-            </div>
+    <>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Dashboard</h2>
+        <div className="flex items-center gap-4">
+          <select
+            value={selectedProject || ''}
+            onChange={(e) => setSelectedProject(e.target.value || null)}
+            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Projects</option>
+            {projects.map((project) => (
+              <option key={project._id} value={project._id}>
+                {project.name}
+              </option>
+            ))}
+          </select>
+          {selectedProject && (
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              Clear Filter
+            </button>
           )}
+        </div>
+      </div>
 
-          {loading ? (
-            <div className="text-center py-12">Loading...</div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="text-center py-12">Loading...</div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                 {budgetData.map((project) => (
                   <Card 
                     key={project.projectId}
@@ -214,8 +208,6 @@ export default function Dashboard() {
               </div>
             </>
           )}
-        </main>
-      </div>
-    </div>
+    </>
   );
 }

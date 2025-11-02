@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '@/components/layout/Navbar';
-import Sidebar from '@/components/layout/Sidebar';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -173,10 +171,8 @@ export default function ProjectsPage() {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
       <div className="flex-1 flex flex-col">
-        <Navbar />
-        <main className="flex-1 p-6">
+        <main className="flex-1">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Projects</h2>
             {canCreate && !permissionsLoading && (

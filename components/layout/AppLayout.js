@@ -10,10 +10,11 @@ import Sidebar from './Sidebar';
 export default function AppLayout({ children }) {
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      {/* <Sidebar /> */}
+      {/* Main content area with margin for fixed sidebar */}
       <div className="flex-1 flex flex-col">
-        <Navbar />
-        <main className="flex-1 p-6">
+        {/* <Navbar /> */}
+        <main className="flex-1">
           {children}
         </main>
       </div>

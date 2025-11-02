@@ -11,13 +11,26 @@ async function getCategories(request) {
 
   const { searchParams } = new URL(request.url);
   const phaseId = searchParams.get('phaseId');
+  const page = parseInt(searchParams.get('page')) || 1;
+  const limit = parseInt(searchParams.get('limit')) || 10;
+  const skip = (page - 1) * limit;
 
   const filter = { companyId: userPayload.companyId };
   if (phaseId) filter.phaseId = phaseId;
 
-  const categories = await Category.find(filter).populate('phaseId', 'name').sort({ createdAt: -1 });
+  const [categories, totalItems] = await Promise.all([
+    Category.find(filter).populate('phaseId', 'name').sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Category.countDocuments(filter),
+  ]);
 
-  return { categories };
+  const pagination = {
+    currentPage: page,
+    totalPages: Math.ceil(totalItems / limit),
+    totalItems,
+    itemsPerPage: limit,
+  };
+
+  return { categories, pagination };
 }
 
 async function createCategory(request) {
