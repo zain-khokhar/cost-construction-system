@@ -46,6 +46,7 @@ export default function ProjectDetailPage({ params }) {
     loading: formLoading,
     setFormData,
     toggleForm,
+    openForm,
     handlePhaseSubmit,
     handleCategorySubmit,
     handleItemSubmit,
@@ -205,6 +206,154 @@ export default function ProjectDetailPage({ params }) {
     }
   };
 
+  // Edit handlers
+  const handleEditPhase = (phase) => {
+    setFormData({
+      name: phase.name,
+      description: phase.description || '',
+      _id: phase._id
+    });
+    openForm('phases');
+  };
+
+  const handleEditCategory = (category) => {
+    setFormData({
+      name: category.name,
+      description: category.description || '',
+      phaseId: category.phaseId?._id || category.phaseId,
+      _id: category._id
+    });
+    openForm('categories');
+  };
+
+  const handleEditItem = (item) => {
+    setFormData({
+      name: item.name,
+      unit: item.unit,
+      ratePerUnit: item.ratePerUnit,
+      categoryId: item.categoryId?._id || item.categoryId,
+      defaultVendor: item.defaultVendor?._id || item.defaultVendor || '',
+      _id: item._id
+    });
+    openForm('items');
+  };
+
+  const handleEditPurchase = (purchase) => {
+    setFormData({
+      phaseId: purchase.phaseId?._id || purchase.phaseId || '',
+      categoryId: purchase.categoryId?._id || purchase.categoryId || '',
+      itemId: purchase.itemId?._id || purchase.itemId,
+      vendorId: purchase.vendorId?._id || purchase.vendorId || '',
+      quantity: purchase.quantity,
+      pricePerUnit: purchase.pricePerUnit,
+      purchaseDate: purchase.purchaseDate ? new Date(purchase.purchaseDate).toISOString().split('T')[0] : '',
+      invoiceUrl: purchase.invoiceUrl || '',
+      _id: purchase._id
+    });
+    openForm('purchases');
+  };
+
+  // Delete handlers
+  const handleDeletePhase = async (phaseId) => {
+    if (!window.confirm('Are you sure you want to delete this phase? This will also delete all associated categories and items.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/phases/${phaseId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        await fetchPhases(phasesPagination.currentPage, phasesPagination.itemsPerPage);
+        setSelectedPhases(selectedPhases.filter(id => id !== phaseId));
+      } else {
+        alert(data.error?.message || 'Failed to delete phase');
+      }
+    } catch (error) {
+      console.error('Delete phase error:', error);
+      alert('Failed to delete phase');
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId) => {
+    if (!window.confirm('Are you sure you want to delete this category? This will also delete all associated items.')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/categories/${categoryId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        await fetchCategories(categoriesPagination.currentPage, categoriesPagination.itemsPerPage);
+        setSelectedCategories(selectedCategories.filter(id => id !== categoryId));
+      } else {
+        alert(data.error?.message || 'Failed to delete category');
+      }
+    } catch (error) {
+      console.error('Delete category error:', error);
+      alert('Failed to delete category');
+    }
+  };
+
+  const handleDeleteItem = async (itemId) => {
+    if (!window.confirm('Are you sure you want to delete this item?')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/items/${itemId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        await fetchAllItems(itemsPagination.currentPage, itemsPagination.itemsPerPage);
+        setSelectedItems(selectedItems.filter(id => id !== itemId));
+      } else {
+        alert(data.error?.message || 'Failed to delete item');
+      }
+    } catch (error) {
+      console.error('Delete item error:', error);
+      alert('Failed to delete item');
+    }
+  };
+
+  const handleDeletePurchase = async (purchaseId) => {
+    if (!window.confirm('Are you sure you want to delete this purchase?')) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/purchases/${purchaseId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        await fetchPurchases(purchasesPagination.currentPage, purchasesPagination.itemsPerPage);
+        setSelectedPurchases(selectedPurchases.filter(id => id !== purchaseId));
+      } else {
+        alert(data.error?.message || 'Failed to delete purchase');
+      }
+    } catch (error) {
+      console.error('Delete purchase error:', error);
+      alert('Failed to delete purchase');
+    }
+  };
+
   // Loading state
   if (loading && !project) {
     return (
@@ -274,6 +423,9 @@ export default function ProjectDetailPage({ params }) {
           selectedPhases={selectedPhases}
           onSelectAll={handleSelectAllPhases}
           onSelectPhase={handleSelectPhase}
+          onEdit={handleEditPhase}
+          onDelete={handleDeletePhase}
+          canEdit={canCreate}
         />
       )}
 
@@ -295,6 +447,9 @@ export default function ProjectDetailPage({ params }) {
           selectedCategories={selectedCategories}
           onSelectAll={handleSelectAllCategories}
           onSelectCategory={handleSelectCategory}
+          onEdit={handleEditCategory}
+          onDelete={handleDeleteCategory}
+          canEdit={canCreate}
         />
       )}
 
@@ -317,7 +472,11 @@ export default function ProjectDetailPage({ params }) {
           selectedItems={selectedItems}
           onSelectAll={handleSelectAllItems}
           onSelectItem={handleSelectItem}
+          onEdit={handleEditItem}
+          onDelete={handleDeleteItem}
+          canEdit={canCreate}
         />
+        
       )}
 
       {activeTab === 'purchases' && (
@@ -343,6 +502,9 @@ export default function ProjectDetailPage({ params }) {
           selectedPurchases={selectedPurchases}
           onSelectAll={handleSelectAllPurchases}
           onSelectPurchase={handleSelectPurchase}
+          onEdit={handleEditPurchase}
+          onDelete={handleDeletePurchase}
+          canEdit={canCreateExpense}
         />
       )}
 
