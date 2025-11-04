@@ -30,6 +30,11 @@ const projectSchema = new mongoose.Schema(
       required: [true, 'Total budget is required'],
       min: 0,
     },
+    status: {
+      type: String,
+      enum: ['starting_soon', 'ongoing', 'paused', 'completed'],
+      default: 'starting_soon',
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

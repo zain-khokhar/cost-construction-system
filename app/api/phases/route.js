@@ -11,13 +11,26 @@ async function getPhases(request) {
 
   const { searchParams } = new URL(request.url);
   const projectId = searchParams.get('projectId');
+  const page = parseInt(searchParams.get('page')) || 1;
+  const limit = parseInt(searchParams.get('limit')) || 10;
+  const skip = (page - 1) * limit;
 
   const filter = { companyId: userPayload.companyId };
   if (projectId) filter.projectId = projectId;
 
-  const phases = await Phase.find(filter).populate('projectId', 'name').sort({ createdAt: -1 });
+  const [phases, totalItems] = await Promise.all([
+    Phase.find(filter).populate('projectId', 'name').sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Phase.countDocuments(filter),
+  ]);
 
-  return { phases };
+  const pagination = {
+    currentPage: page,
+    totalPages: Math.ceil(totalItems / limit),
+    totalItems,
+    itemsPerPage: limit,
+  };
+
+  return { phases, pagination };
 }
 
 async function createPhase(request) {

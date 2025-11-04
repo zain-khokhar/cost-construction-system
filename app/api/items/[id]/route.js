@@ -30,6 +30,9 @@ async function updateItem(request, { params }) {
   const { id } = await params;
   const body = await request.json();
 
+  // Remove empty string fields to avoid ObjectId cast errors
+  if (body.defaultVendor === '') delete body.defaultVendor;
+
   const item = await Item.findOneAndUpdate(
     { _id: id, companyId: userPayload.companyId },
     body,

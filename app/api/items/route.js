@@ -11,16 +11,31 @@ async function getItems(request) {
 
   const { searchParams } = new URL(request.url);
   const categoryId = searchParams.get('categoryId');
+  const page = parseInt(searchParams.get('page')) || 1;
+  const limit = parseInt(searchParams.get('limit')) || 10;
+  const skip = (page - 1) * limit;
 
   const filter = { companyId: userPayload.companyId };
   if (categoryId) filter.categoryId = categoryId;
 
-  const items = await Item.find(filter)
-    .populate('categoryId', 'name')
-    .populate('defaultVendor', 'name')
-    .sort({ createdAt: -1 });
+  const [items, totalItems] = await Promise.all([
+    Item.find(filter)
+      .populate('categoryId', 'name')
+      .populate('defaultVendor', 'name')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Item.countDocuments(filter),
+  ]);
 
-  return { items };
+  const pagination = {
+    currentPage: page,
+    totalPages: Math.ceil(totalItems / limit),
+    totalItems,
+    itemsPerPage: limit,
+  };
+
+  return { items, pagination };
 }
 
 async function createItem(request) {

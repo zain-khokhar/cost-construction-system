@@ -1,7 +1,13 @@
 import clsx from 'clsx';
 
-export default function Button({ children, variant = 'primary', type = 'button', onClick, disabled, className, ...props }) {
-  const baseStyles = 'px-4 py-2 rounded font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+export default function Button({ children, variant = 'primary', size = 'md', type = 'button', onClick, disabled, className, ...props }) {
+  const baseStyles = 'rounded font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+  
+  const sizes = {
+    sm: 'px-2 py-1 text-sm',
+    md: 'px-4 py-2',
+    lg: 'px-6 py-3 text-lg',
+  };
   
   const variants = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700',
@@ -15,7 +21,7 @@ export default function Button({ children, variant = 'primary', type = 'button',
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={clsx(baseStyles, variants[variant], className)}
+      className={clsx(baseStyles, sizes[size], variants[variant], className)}
       {...props}
     >
       {children}

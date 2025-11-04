@@ -77,6 +77,14 @@ export default function SignupPage() {
         throw new Error(data.error?.message || 'Registration failed');
       }
 
+      // Check if user is pending approval
+      if (data.data.status === 'pending') {
+        // Show pending message and redirect to login
+        alert(data.data.message || 'Your request has been sent to the company admin for approval.');
+        router.push('/login');
+        return;
+      }
+
       // Use window.location for proper redirect with cookie
       window.location.href = '/login?registered=true';
     } catch (err) {
@@ -116,15 +124,6 @@ export default function SignupPage() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
                 placeholder="Min 6 characters"
-              />
-              <Select
-                label="Role"
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                options={[
-                  { value: 'viewer', label: 'Viewer (Read Only)' },
-                  { value: 'manager', label: 'Manager (Full Access)' },
-                ]}
               />
               {error && <div className="text-red-600 text-sm">{error}</div>}
               <Button onClick={handleNext} className="w-full">
@@ -190,9 +189,12 @@ export default function SignupPage() {
                     }
                     placeholder="e.g., abcconstruction.com"
                   />
-                  <p className="text-xs text-gray-500">
-                    You will be the first user of this company. You can invite others later.
-                  </p>
+                  <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                    <p className="text-sm text-blue-800">
+                      <strong>Note:</strong> You will automatically become the <strong>Admin</strong> of this company.
+                      You'll be able to invite other users and manage projects.
+                    </p>
+                  </div>
                 </>
               ) : (
                 <>
@@ -203,6 +205,21 @@ export default function SignupPage() {
                     required
                     placeholder="Enter company ID provided by your administrator"
                   />
+                  <Select
+                    label="Your Role"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    options={[
+                      { value: 'viewer', label: 'Viewer (Read Only)' },
+                      { value: 'manager', label: 'Manager (Log Expenses)' },
+                    ]}
+                  />
+                  <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Note:</strong> Your account request will be sent to the company admin for approval.
+                      You'll be able to login after admin approves your request.
+                    </p>
+                  </div>
                   <p className="text-xs text-gray-500">
                     Contact your company administrator to get the Company ID.
                   </p>

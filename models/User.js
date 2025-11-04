@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema(
       enum: ['admin', 'manager', 'viewer'],
       default: 'viewer',
     },
+    status: {
+      type: String,
+      enum: ['pending', 'active', 'rejected'],
+      default: 'active',
+    },
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Company',

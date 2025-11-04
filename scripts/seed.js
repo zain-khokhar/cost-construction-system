@@ -56,7 +56,7 @@ async function seed() {
     // Create admin user
     const adminData = {
       name: 'Admin User',
-      email: 'admin@example.com',
+      email: 'admin@admin.com',
       password: 'Admin@123',
       role: 'admin',
       companyId: company._id,

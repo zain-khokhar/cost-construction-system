@@ -37,6 +37,18 @@ async function handler(request) {
 
   console.log('[LOGIN] Password valid');
 
+  // Check if user account is pending approval
+  if (user.status === 'pending') {
+    console.log('[LOGIN] User account pending approval:', email);
+    throw new ApiError('Your account is pending approval from the company admin. Please wait for approval.', 403);
+  }
+
+  // Check if user account is rejected
+  if (user.status === 'rejected') {
+    console.log('[LOGIN] User account rejected:', email);
+    throw new ApiError('Your account request has been rejected by the company admin.', 403);
+  }
+
   // Ensure companyId is a string
   const companyIdString = typeof user.companyId === 'string' 
     ? user.companyId 

@@ -58,7 +58,7 @@ function LoginForm() {
       console.log('[CLIENT] Performing hard navigation to /');
       // Force full navigation so the browser applies the Set-Cookie header
       // and server-side middleware sees the new cookie on the next request.
-      // window.location.href = '/';
+      window.location.href = '/';
     } catch (err) {
       console.error('[CLIENT] Login error:', err);
       setError(err.message);
@@ -102,7 +102,7 @@ function LoginForm() {
             </Link>
           </p>
           <p className="mt-2 text-sm text-gray-600 text-center">
-            Default admin: admin@example.com / Admin@123
+            Default admin: admin@admin.com / Admin@123
           </p>
         </Card>
       </div>

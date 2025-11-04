@@ -34,6 +34,16 @@ async function updatePurchase(request, { params }) {
   const { id } = await params;
   const body = await request.json();
 
+  // Calculate totalCost if quantity or pricePerUnit is provided
+  if (body.quantity && body.pricePerUnit) {
+    body.totalCost = body.quantity * body.pricePerUnit;
+  }
+
+  // Remove empty string fields to avoid ObjectId cast errors
+  if (body.vendorId === '') delete body.vendorId;
+  if (body.phaseId === '') delete body.phaseId;
+  if (body.categoryId === '') delete body.categoryId;
+
   const purchase = await Purchase.findOneAndUpdate(
     { _id: id, companyId: userPayload.companyId },
     body,
