@@ -16,7 +16,7 @@ import { useProjectForms } from '@/lib/hooks/useProjectForms';
 export default function ProjectDetailPage({ params }) {
   const { id } = use(params);
   const { canCreate, canCreateExpense, loading: permissionsLoading } = usePermissions();
-  
+
   // Custom hooks for data and form management
   const {
     project,
@@ -51,12 +51,12 @@ export default function ProjectDetailPage({ params }) {
     handleCategorySubmit,
     handleItemSubmit,
     handlePurchaseSubmit,
-  } = useProjectForms(id, { 
-    fetchData, 
-    fetchPhases, 
-    fetchCategories, 
-    fetchItems, 
-    fetchAllItems, 
+  } = useProjectForms(id, {
+    fetchData,
+    fetchPhases,
+    fetchCategories,
+    fetchItems,
+    fetchAllItems,
     fetchPurchases,
     phasesPagination,
     categoriesPagination,
@@ -67,7 +67,7 @@ export default function ProjectDetailPage({ params }) {
   // Local state
   const [activeTab, setActiveTab] = useState('phases');
   const [exportModal, setExportModal] = useState({ isOpen: false, type: '', title: '' });
-  
+
   // Selection state for each tab
   const [selectedPhases, setSelectedPhases] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -375,9 +375,9 @@ export default function ProjectDetailPage({ params }) {
   return (
     <AppLayout>
       {/* Project Header */}
-      <ProjectHeader 
-        project={project} 
-        activeTab={activeTab} 
+      <ProjectHeader
+        project={project}
+        activeTab={activeTab}
         onExport={openExportModal}
       />
 
@@ -394,11 +394,10 @@ export default function ProjectDetailPage({ params }) {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-6 py-3 capitalize font-medium transition-all ${
-              activeTab === tab.id 
-                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50' 
-                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-            }`}
+            className={`px-6 py-3 capitalize font-medium transition-all ${activeTab === tab.id
+              ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
           >
             {tab.label}
           </button>
@@ -476,7 +475,7 @@ export default function ProjectDetailPage({ params }) {
           onDelete={handleDeleteItem}
           canEdit={canCreate}
         />
-        
+
       )}
 
       {activeTab === 'purchases' && (

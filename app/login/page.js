@@ -35,22 +35,14 @@ function LoginForm() {
         credentials: 'include', // Important: Include cookies in request
       });
 
-      console.log('[CLIENT] Login response status:', res.status);
-      console.log('[CLIENT] Login response headers:', [...res.headers.entries()]);
-      
       // Check specifically for Set-Cookie header
       const setCookie = res.headers.get('set-cookie');
-      console.log('[CLIENT] Set-Cookie header:', setCookie);
 
       const data = await res.json();
-      console.log('[CLIENT] Login response data:', data);
 
       if (!res.ok) {
-        console.log('[CLIENT] Login failed:', data.error?.message);
         throw new Error(data.error?.message || 'Login failed');
       }
-
-      console.log('[CLIENT] Login successful, navigating to home');
       
       // Small delay to ensure cookie is processed by browser
       await new Promise(resolve => setTimeout(resolve, 100));
