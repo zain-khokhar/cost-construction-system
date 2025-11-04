@@ -24,6 +24,8 @@ async function handler(request) {
 
   let companyId = body.companyId;
   let isFirstUser = false;
+  let userStatus = 'active'; // Default status
+  let userRole = body.role || 'viewer';
 
   // If registering with a new company, create it first
   if (body.companyName && !body.companyId) {
@@ -33,6 +35,11 @@ async function handler(request) {
     });
     companyId = company._id.toString();
     isFirstUser = true; // First user of new company becomes admin
+    
+    // If manager creates new company, upgrade to admin
+    if (body.role === 'manager' || body.role === 'admin') {
+      userRole = 'admin';
+    }
   }
 
   // Validate companyId exists
@@ -46,15 +53,47 @@ async function handler(request) {
     if (!companyExists) {
       throw new ApiError('Company not found', 404);
     }
+    
+    // Check if there's already an admin in this company
+    const existingAdmin = await User.findOne({ companyId: body.companyId, role: 'admin', status: 'active' });
+    
+    if (existingAdmin && (body.role === 'manager' || body.role === 'viewer')) {
+      // If admin exists and user is manager/viewer, set status to pending
+      userStatus = 'pending';
+    } else if (!existingAdmin) {
+      // If no admin exists, first user becomes admin
+      userRole = 'admin';
+      userStatus = 'active';
+    }
   }
 
+  // Create user
   const user = await User.create({
     name: body.name,
     email: body.email,
     password: body.password,
-    role: isFirstUser ? 'admin' : (body.role || 'viewer'), // First user becomes admin
+    role: isFirstUser ? 'admin' : userRole,
+    status: userStatus,
     companyId,
   });
+
+  // If user is pending, return different response
+  if (userStatus === 'pending') {
+    return NextResponse.json({
+      ok: true,
+      data: {
+        message: 'Registration successful! Your request has been sent to the company admin for approval.',
+        status: 'pending',
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          status: user.status,
+        },
+      },
+    });
+  }
 
   // Get the final companyId as string
   const finalCompanyId = typeof user.companyId === 'string' 

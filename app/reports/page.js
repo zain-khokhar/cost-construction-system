@@ -91,7 +91,7 @@ export default function ReportsPage() {
     <AppLayout>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Reports</h2>
-        <Button 
+        <Button
           onClick={() => openExportModal('purchases', 'Export Purchases Report')}
           disabled={purchases.length === 0}
         >
@@ -102,21 +102,21 @@ export default function ReportsPage() {
       <Card className="mb-6">
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-[200px]">
-                <Select
-                  label="Project"
-                  options={[
-                    { value: '', label: 'All Projects' },
-                    ...projects.map((p) => ({ value: p._id, label: p.name })),
-                  ]}
-                  value={selectedProject}
-                  onChange={(e) => setSelectedProject(e.target.value)}
-                />
-              </div>
-              <div className="flex-1 min-w-[200px]">
-                <Select
-                  label="Date Range"
-                  options={[
-                    { value: 'all', label: 'All Time' },
+            <Select
+              label="Project"
+              options={[
+                { value: '', label: 'All Projects' },
+                ...projects.map((p) => ({ value: p._id, label: p.name })),
+              ]}
+              value={selectedProject}
+              onChange={(e) => setSelectedProject(e.target.value)}
+            />
+          </div>
+          <div className="flex-1 min-w-[200px]">
+            <Select
+              label="Date Range"
+              options={[
+                { value: 'all', label: 'All Time' },
                 { value: 'monthly', label: 'This Month' },
               ]}
               value={dateRange}

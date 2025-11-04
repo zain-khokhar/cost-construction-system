@@ -15,6 +15,7 @@ A clean, professional **multi-tenant** construction cost management system using
 - **Project Management**: Track multiple construction projects with budgets
 - **Expense Tracking**: Record purchases with phases (Grey/Finishing), categories, items, and vendors
 - **Analytics Dashboard**: Visualize spending by phase, items, vendors, and budget vs actual
+- **AI Chatbot**: Natural language queries for instant data access (NEW!)
 - **Reports**: Filter and export purchase data to CSV
 - **Clean UI**: Minimal design with Tailwind CSS, mobile-friendly
 
@@ -288,6 +289,21 @@ npm run lint
 - Run `npm install` to ensure all dependencies are installed
 - Check for syntax errors in JavaScript files
 - Verify all imports use correct paths
+
+## AI Chatbot Usage
+
+The AI Chatbot is available on all authenticated pages (look for the blue button in bottom-right corner).
+
+**Example Queries:**
+- "What's the total spent on Phase 1?"
+- "Show me cement purchases this month"
+- "Compare Project A to Project B"
+- "Show me vendor spending"
+- "Give me project summary"
+
+For detailed documentation, see:
+- [AI Chatbot Documentation](./AI_CHATBOT_DOCS.md)
+- [Quick Reference Guide](./AI_CHATBOT_QUICK_REFERENCE.md)
 
 ## License
 

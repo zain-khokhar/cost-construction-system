@@ -4,6 +4,7 @@ import './globals.css';
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
 import Sidebar from '@/components/layout/Sidebar';
+import AIChatbot from '@/components/AIChatbot';
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
@@ -29,6 +30,8 @@ export default function RootLayout({ children }) {
                 {children}
               </main>
             </div>
+            {/* AI Chatbot - Available on all authenticated pages */}
+            <AIChatbot />
           </div>
         )}
       </body>

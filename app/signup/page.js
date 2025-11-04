@@ -77,6 +77,14 @@ export default function SignupPage() {
         throw new Error(data.error?.message || 'Registration failed');
       }
 
+      // Check if user is pending approval
+      if (data.data.status === 'pending') {
+        // Show pending message and redirect to login
+        alert(data.data.message || 'Your request has been sent to the company admin for approval.');
+        router.push('/login');
+        return;
+      }
+
       // Use window.location for proper redirect with cookie
       window.location.href = '/login?registered=true';
     } catch (err) {
@@ -206,6 +214,12 @@ export default function SignupPage() {
                       { value: 'manager', label: 'Manager (Log Expenses)' },
                     ]}
                   />
+                  <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Note:</strong> Your account request will be sent to the company admin for approval.
+                      You'll be able to login after admin approves your request.
+                    </p>
+                  </div>
                   <p className="text-xs text-gray-500">
                     Contact your company administrator to get the Company ID.
                   </p>

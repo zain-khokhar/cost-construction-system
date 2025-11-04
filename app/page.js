@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
-import PhaseCostBarChart from '@/components/charts/PhaseCostBarChart';
-import TopItemsBarChart from '@/components/charts/TopItemsBarChart';
+import BudgetProgressChart from '@/components/charts/BudgetProgressChart';
+import CostTrendChart from '@/components/charts/CostTrendChart';
+import ItemCostHorizontalChart from '@/components/charts/ItemCostHorizontalChart';
 import VendorSpendPieChart from '@/components/charts/VendorSpendPieChart';
 
 export default function Dashboard() {
@@ -21,12 +22,12 @@ export default function Dashboard() {
   useEffect(() => {
     fetchProjects();
     fetchAnalytics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (selectedProject) {
-      fetchAnalytics(selectedProject);
-    }
+    fetchAnalytics(selectedProject);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedProject]);
 
   const fetchProjects = async () => {
@@ -295,23 +296,83 @@ export default function Dashboard() {
               </svg>
               Analytics & Insights
             </h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card title="Phase Cost Summary" className="shadow-lg">
-                {phaseData.length > 0 ? (
-                  <PhaseCostBarChart data={phaseData} />
+            
+            {/* First Row - Budget Progress and Utilization */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <Card title="Budget vs Actual Spending" className="shadow-lg">
+                {budgetData.length > 0 ? (
+                  <BudgetProgressChart data={budgetData} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
-                    <p className="font-medium">No phase data available</p>
+                    <p className="font-medium">No budget data available</p>
                   </div>
                 )}
               </Card>
 
-              <Card title="Top 5 Items by Cost" className="shadow-lg">
+              <Card title="Overall Budget Utilization" className="shadow-lg">
+                {budgetData.length > 0 ? (
+                  <div className="h-80 flex items-center justify-center">
+                    <div className="w-full max-w-md text-center">
+                      <div className="text-center mb-8">
+                        <p className="text-6xl font-bold text-blue-600 mb-2">
+                          {((summaryStats.totalSpent / summaryStats.totalBudget) * 100).toFixed(1)}%
+                        </p>
+                        <p className="text-lg text-gray-600 font-medium">Overall Utilization</p>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                          <span className="text-gray-700 font-medium">Spent</span>
+                          <span className="text-green-700 font-bold text-lg">${summaryStats.totalSpent.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                          <span className="text-gray-700 font-medium">Remaining</span>
+                          <span className="text-blue-700 font-bold text-lg">${summaryStats.totalRemaining.toLocaleString()}</span>
+                        </div>
+                        {summaryStats.totalSpent > summaryStats.totalBudget && (
+                          <div className="flex justify-between items-center p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+                            <span className="text-gray-700 font-medium">Over Budget</span>
+                            <span className="text-red-700 font-bold text-lg">${(summaryStats.totalSpent - summaryStats.totalBudget).toLocaleString()}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                    <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                    <p className="font-medium">No budget data available</p>
+                  </div>
+                )}
+              </Card>
+            </div>
+
+            {/* Second Row - Phase Cost Trend */}
+            <div className="grid grid-cols-1 gap-6 mb-6">
+              <Card title="Phase Cost Trend Analysis" className="shadow-lg">
+                {phaseData.length > 0 ? (
+                  <CostTrendChart data={phaseData} />
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                    <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                    </svg>
+                    <p className="font-medium">No phase data available</p>
+                  </div>
+                )}
+              </Card>
+            </div>
+
+            {/* Third Row - Items and Vendors */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card title="Top 5 Expensive Items" className="shadow-lg">
                 {itemData.length > 0 ? (
-                  <TopItemsBarChart data={itemData} />
+                  <ItemCostHorizontalChart data={itemData} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -322,7 +383,7 @@ export default function Dashboard() {
                 )}
               </Card>
 
-              <Card title="Vendor Spend Distribution" className="lg:col-span-2 shadow-lg">
+              <Card title="Vendor Spend Distribution" className="shadow-lg">
                 {vendorData.length > 0 ? (
                   <VendorSpendPieChart data={vendorData} />
                 ) : (
