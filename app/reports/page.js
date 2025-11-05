@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -35,28 +35,29 @@ export default function ReportsPage() {
   const [selectedPurchases, setSelectedPurchases] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
-  const openExportModal = () => {
+  // Memoized event handlers
+  const openExportModal = useCallback(() => {
     setExportModal({ isOpen: true });
-  };
+  }, []);
 
-  const closeExportModal = () => {
+  const closeExportModal = useCallback(() => {
     setExportModal({ isOpen: false });
-  };
+  }, []);
 
-  const handlePageChange = (page) => {
+  const handlePageChange = useCallback((page) => {
     updatePagination('currentPage', page);
     setSelectedPurchases([]); // Clear selections when changing pages
     setSelectAll(false);
-  };
+  }, [updatePagination]);
 
-  const handleItemsPerPageChange = (limit) => {
+  const handleItemsPerPageChange = useCallback((limit) => {
     updatePagination('itemsPerPage', limit);
     updatePagination('currentPage', 1);
     setSelectedPurchases([]);
     setSelectAll(false);
-  };
+  }, [updatePagination]);
 
-  const handleSelectAll = (checked) => {
+  const handleSelectAll = useCallback((checked) => {
     setSelectAll(checked);
     if (checked) {
       // Select all purchases on current page
@@ -64,18 +65,18 @@ export default function ReportsPage() {
     } else {
       setSelectedPurchases([]);
     }
-  };
+  }, [purchases]);
 
-  const handleSelectPurchase = (purchaseId, checked) => {
+  const handleSelectPurchase = useCallback((purchaseId, checked) => {
     if (checked) {
-      setSelectedPurchases([...selectedPurchases, purchaseId]);
+      setSelectedPurchases(prev => [...prev, purchaseId]);
     } else {
-      setSelectedPurchases(selectedPurchases.filter(id => id !== purchaseId));
+      setSelectedPurchases(prev => prev.filter(id => id !== purchaseId));
       setSelectAll(false);
     }
-  };
+  }, []);
 
-  const getExportData = async () => {
+  const getExportData = useCallback(async () => {
     if (selectAll) {
       // Export all data across all pages
       return await fetchAllPurchasesForExport();
@@ -84,7 +85,71 @@ export default function ReportsPage() {
       return purchases.filter(p => selectedPurchases.includes(p._id));
     }
     return null;
-  };
+  }, [selectAll, selectedPurchases, purchases, fetchAllPurchasesForExport]);
+
+  // Memoized table headers to prevent re-creation on every render
+  const tableHeaders = useMemo(() => [
+    <input
+      key="select-all"
+      type="checkbox"
+      checked={selectAll}
+      onChange={(e) => handleSelectAll(e.target.checked)}
+      className="w-4 h-4 text-blue-600 rounded"
+    />,
+    'Date',
+    'Project',
+    'Phase',
+    'Category',
+    'Item',
+    'Quantity',
+    'Unit Price',
+    'Total',
+    'Vendor'
+  ], [selectAll, handleSelectAll]);
+
+  // Memoized render row function to prevent re-creation on every render
+  const renderPurchaseRow = useCallback((purchase, index) => (
+    <>
+      <td className="px-6 py-4">
+        <input
+          type="checkbox"
+          checked={selectedPurchases.includes(purchase._id)}
+          onChange={(e) => handleSelectPurchase(purchase._id, e.target.checked)}
+          className="w-4 h-4 text-blue-600 rounded"
+        />
+      </td>
+    
+      <td className="px-6 py-4">
+        {format(new Date(purchase.purchaseDate), 'MMM dd, yyyy')}
+      </td>
+      <td className="px-6 py-4">{purchase.projectId?.name || 'N/A'}</td>
+      <td className="px-6 py-4">{purchase.phaseId?.name || 'N/A'}</td>
+      <td className="px-6 py-4">{purchase.categoryId?.name || 'N/A'}</td>
+      <td className="px-6 py-4">{purchase.itemId?.name || 'N/A'}</td>
+      <td className="px-6 py-4">{purchase.quantity || 0} {purchase.itemId?.unit || ''}</td>
+      <td className="px-6 py-4">${(purchase.pricePerUnit || 0).toLocaleString()}</td>
+      <td className="px-6 py-4 font-medium">${(purchase.totalCost || 0).toLocaleString()}</td>
+      <td className="px-6 py-4">{purchase.vendorId?.name || 'N/A'}</td>
+    </>
+  ), [selectedPurchases, handleSelectPurchase]);
+
+  // Memoized export title
+  const exportTitle = useMemo(() => 
+    `Export ${selectAll ? 'All' : selectedPurchases.length > 0 ? 'Selected' : 'Current Page'} Purchases`,
+    [selectAll, selectedPurchases.length]
+  );
+
+  // Memoized export button text
+  const exportButtonText = useMemo(() => 
+    `Export ${selectedPurchases.length > 0 ? 'Selected' : 'All'}`,
+    [selectedPurchases.length]
+  );
+
+  // Memoized selected count text
+  const selectedCountText = useMemo(() => 
+    selectAll ? `All ${pagination.totalItems} items selected` : `${selectedPurchases.length} selected`,
+    [selectAll, pagination.totalItems, selectedPurchases.length]
+  );
 
   return (
     <AppLayout>
@@ -94,7 +159,7 @@ export default function ReportsPage() {
           {selectedPurchases.length > 0 && (
             <div className="flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg">
               <span className="font-medium">
-                {selectAll ? `All ${pagination.totalItems} items selected` : `${selectedPurchases.length} selected`}
+                {selectedCountText}
               </span>
             </div>
           )}
@@ -102,7 +167,7 @@ export default function ReportsPage() {
             onClick={openExportModal}
             disabled={purchases.length === 0}
           >
-            Export {selectedPurchases.length > 0 ? 'Selected' : 'All'}
+            {exportButtonText}
           </Button>
         </div>
       </div>
@@ -149,49 +214,9 @@ export default function ReportsPage() {
         ) : (
           <>
             <Table
-              headers={[
-                <input
-                  key="select-all"
-                  type="checkbox"
-                  checked={selectAll}
-                  onChange={(e) => handleSelectAll(e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded"
-                />,
-                'Date',
-                'Project',
-                'Phase',
-                'Category',
-                'Item',
-                'Quantity',
-                'Unit Price',
-                'Total',
-                'Vendor'
-              ]}
+              headers={tableHeaders}
               data={purchases}
-              renderRow={(purchase, index) => (
-                <>
-                  <td className="px-6 py-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedPurchases.includes(purchase._id)}
-                      onChange={(e) => handleSelectPurchase(purchase._id, e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded"
-                    />
-                  </td>
-                
-                  <td className="px-6 py-4">
-                    {format(new Date(purchase.purchaseDate), 'MMM dd, yyyy')}
-                  </td>
-                  <td className="px-6 py-4">{purchase.projectId?.name || 'N/A'}</td>
-                  <td className="px-6 py-4">{purchase.phaseId?.name || 'N/A'}</td>
-                  <td className="px-6 py-4">{purchase.categoryId?.name || 'N/A'}</td>
-                  <td className="px-6 py-4">{purchase.itemId?.name || 'N/A'}</td>
-                  <td className="px-6 py-4">{purchase.quantity || 0} {purchase.itemId?.unit || ''}</td>
-                  <td className="px-6 py-4">${(purchase.pricePerUnit || 0).toLocaleString()}</td>
-                  <td className="px-6 py-4 font-medium">${(purchase.totalCost || 0).toLocaleString()}</td>
-                  <td className="px-6 py-4">{purchase.vendorId?.name || 'N/A'}</td>
-                </>
-              )}
+              renderRow={renderPurchaseRow}
             />
             
             {/* Pagination */}
@@ -214,7 +239,7 @@ export default function ReportsPage() {
         isOpen={exportModal.isOpen}
         onClose={closeExportModal}
         exportType="purchases"
-        title={`Export ${selectAll ? 'All' : selectedPurchases.length > 0 ? 'Selected' : 'Current Page'} Purchases`}
+        title={exportTitle}
         exportParams={filters}
         selectedIds={selectedPurchases}
         exportAll={selectAll}
