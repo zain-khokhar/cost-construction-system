@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import BudgetProgressChart from '@/components/charts/BudgetProgressChart';
@@ -19,18 +19,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchProjects();
-    fetchAnalytics();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    fetchAnalytics(selectedProject);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProject]);
-
-  const fetchProjects = async () => {
+  // Memoized data-fetching functions
+  const fetchProjects = useCallback(async () => {
     try {
       const res = await fetch('/api/projects', { credentials: 'include' });
       const data = await res.json();
@@ -38,9 +28,9 @@ export default function Dashboard() {
     } catch (err) {
       console.error('Failed to fetch projects:', err);
     }
-  };
+  }, []);
 
-  const fetchAnalytics = async (projectId = null) => {
+  const fetchAnalytics = useCallback(async (projectId = null) => {
     try {
       setError(null);
       setLoading(true);
@@ -89,19 +79,46 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
 
-  // Calculate summary stats
-  const summaryStats = budgetData.reduce((acc, project) => {
-    acc.totalBudget += project.budget || 0;
-    acc.totalSpent += project.spent || 0;
-    acc.totalRemaining += project.remaining || 0;
-    return acc;
-  }, { totalBudget: 0, totalSpent: 0, totalRemaining: 0 });
+  // Effects with proper dependencies
+  useEffect(() => {
+    fetchProjects();
+    fetchAnalytics();
+  }, [fetchProjects, fetchAnalytics]);
 
-  const avgUsage = budgetData.length > 0 
-    ? (summaryStats.totalSpent / summaryStats.totalBudget * 100).toFixed(1)
-    : 0;
+  useEffect(() => {
+    fetchAnalytics(selectedProject);
+  }, [selectedProject, fetchAnalytics]);
+
+  // Memoized event handlers
+  const handleProjectChange = useCallback((e) => {
+    setSelectedProject(e.target.value || null);
+  }, []);
+
+  const handleClearProject = useCallback(() => {
+    setSelectedProject(null);
+  }, []);
+
+  const handleProjectCardClick = useCallback((projectId) => {
+    setSelectedProject(projectId === selectedProject ? null : projectId);
+  }, [selectedProject]);
+
+  // Memoized derived data - expensive calculations
+  const summaryStats = useMemo(() => {
+    return budgetData.reduce((acc, project) => {
+      acc.totalBudget += project.budget || 0;
+      acc.totalSpent += project.spent || 0;
+      acc.totalRemaining += project.remaining || 0;
+      return acc;
+    }, { totalBudget: 0, totalSpent: 0, totalRemaining: 0 });
+  }, [budgetData]);
+
+  const avgUsage = useMemo(() => {
+    return budgetData.length > 0 
+      ? (summaryStats.totalSpent / summaryStats.totalBudget * 100).toFixed(1)
+      : 0;
+  }, [budgetData, summaryStats]);
 
   return (
     <div className="space-y-6">
@@ -114,7 +131,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-3">
           <select
             value={selectedProject || ''}
-            onChange={(e) => setSelectedProject(e.target.value || null)}
+            onChange={handleProjectChange}
             className="bg-white text-gray-900 border-0 rounded-lg px-4 py-2.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md"
           >
             <option value="">All Projects</option>
@@ -126,7 +143,7 @@ export default function Dashboard() {
           </select>
           {selectedProject && (
             <button
-              onClick={() => setSelectedProject(null)}
+              onClick={handleClearProject}
               className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-md"
             >
               Clear
@@ -231,7 +248,7 @@ export default function Dashboard() {
                       ? 'border-blue-500 bg-blue-50 shadow-lg' 
                       : 'border-transparent hover:border-blue-200'
                   }`}
-                  onClick={() => setSelectedProject(project.projectId === selectedProject ? null : project.projectId)}
+                  onClick={() => handleProjectCardClick(project.projectId)}
                 >
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="font-bold text-lg text-gray-800 flex-1">{project.projectName}</h3>
