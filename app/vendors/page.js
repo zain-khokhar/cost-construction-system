@@ -153,20 +153,19 @@ export default function VendorsPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
-        <main className="flex-1">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Vendors</h2>
-            {canCreate && !permissionsLoading && (
-              <Button onClick={() => setShowForm(!showForm)}>
-                {showForm ? 'Cancel' : 'New Vendor'}
-              </Button>
-            )}
-          </div>
+    <div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
+        <h2 className="text-xl md:text-2xl font-bold">Vendors</h2>
+        {canCreate && !permissionsLoading && (
+          <Button onClick={() => setShowForm(!showForm)} className="w-full sm:w-auto">
+            {showForm ? 'Cancel' : 'New Vendor'}
+          </Button>
+        )}
+      </div>
 
-          {showForm && canCreate && (
-            <Card className="mb-6">
-              <h3 className="text-lg font-semibold mb-4">{editingVendor ? 'Edit Vendor' : 'New Vendor'}</h3>
+      {showForm && canCreate && (
+        <Card className="mb-4 md:mb-6">
+          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">{editingVendor ? 'Edit Vendor' : 'New Vendor'}</h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
@@ -298,13 +297,12 @@ export default function VendorsPage() {
                   totalPages={pagination.totalPages}
                   totalItems={pagination.totalItems}
                   itemsPerPage={pagination.itemsPerPage}
-                  onPageChange={(page) => setPagination({ ...pagination, currentPage: page })}
-                  onItemsPerPageChange={(limit) => setPagination({ ...pagination, itemsPerPage: limit, currentPage: 1 })}
-                />
-              </>
-            )}
-          </Card>
-        </main>
+              onPageChange={(page) => setPagination({ ...pagination, currentPage: page })}
+              onItemsPerPageChange={(limit) => setPagination({ ...pagination, itemsPerPage: limit, currentPage: 1 })}
+            />
+          </>
+        )}
+      </Card>
     </div>
   );
 }

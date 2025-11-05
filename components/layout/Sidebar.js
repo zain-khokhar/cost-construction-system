@@ -65,7 +65,7 @@ export default function Sidebar() {
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/70 bg-opacity-50 backdrop-blur-sm bg-opacity-50 z-30"
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-30"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -83,27 +83,27 @@ export default function Sidebar() {
       >
         {/* Company Name Header - Only render after mount to avoid hydration mismatch */}
         {mounted && companyName && (
-          <div className="px-6 py-5 border-b border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 truncate">
+          <div className="px-4 md:px-6 py-4 md:py-5 border-b border-gray-200">
+            <h2 className="text-base md:text-lg font-bold text-gray-900 truncate">
               {companyName}
             </h2>
             <p className="text-xs text-gray-600 mt-1">Construction Management</p>
           </div>
         )}
 
-        <nav className="p-4 overflow-y-auto" style={{ height: mounted && companyName ? 'calc(100vh - 80px)' : '100vh' }}>
-          <ul className="space-y-2">
+        <nav className="p-3 md:p-4 overflow-y-auto" style={{ height: mounted && companyName ? 'calc(100vh - 80px)' : '100vh' }}>
+          <ul className="space-y-1 md:space-y-2">
             {navItems.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={clsx(
-                    'flex items-center gap-3 px-4 py-2 rounded hover:bg-gray-100 transition-colors',
+                    'flex items-center gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded hover:bg-gray-100 transition-colors text-sm md:text-base',
                     pathname === item.href ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
                   )}
                 >
-                  <span className="text-xl">{item.icon}</span>
+                  <span className="text-lg md:text-xl">{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               </li>

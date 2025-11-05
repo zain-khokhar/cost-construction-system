@@ -110,7 +110,7 @@ export default function ReportsPage() {
   // Memoized render row function to prevent re-creation on every render
   const renderPurchaseRow = useCallback((purchase, index) => (
     <>
-      <td className="px-6 py-4">
+      <td className="px-3 md:px-6 py-3 md:py-4">
         <input
           type="checkbox"
           checked={selectedPurchases.includes(purchase._id)}
@@ -119,17 +119,17 @@ export default function ReportsPage() {
         />
       </td>
     
-      <td className="px-6 py-4">
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base whitespace-nowrap">
         {format(new Date(purchase.purchaseDate), 'MMM dd, yyyy')}
       </td>
-      <td className="px-6 py-4">{purchase.projectId?.name || 'N/A'}</td>
-      <td className="px-6 py-4">{purchase.phaseId?.name || 'N/A'}</td>
-      <td className="px-6 py-4">{purchase.categoryId?.name || 'N/A'}</td>
-      <td className="px-6 py-4">{purchase.itemId?.name || 'N/A'}</td>
-      <td className="px-6 py-4">{purchase.quantity || 0} {purchase.itemId?.unit || ''}</td>
-      <td className="px-6 py-4">${(purchase.pricePerUnit || 0).toLocaleString()}</td>
-      <td className="px-6 py-4 font-medium">${(purchase.totalCost || 0).toLocaleString()}</td>
-      <td className="px-6 py-4">{purchase.vendorId?.name || 'N/A'}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.projectId?.name || 'N/A'}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.phaseId?.name || 'N/A'}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.categoryId?.name || 'N/A'}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.itemId?.name || 'N/A'}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.quantity || 0} {purchase.itemId?.unit || ''}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">${(purchase.pricePerUnit || 0).toLocaleString()}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 font-medium text-sm md:text-base">${(purchase.totalCost || 0).toLocaleString()}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.vendorId?.name || 'N/A'}</td>
     </>
   ), [selectedPurchases, handleSelectPurchase]);
 
@@ -153,11 +153,11 @@ export default function ReportsPage() {
 
   return (
     <AppLayout>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Reports</h2>
-        <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
+        <h2 className="text-xl md:text-2xl font-bold">Reports</h2>
+        <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full sm:w-auto">
           {selectedPurchases.length > 0 && (
-            <div className="flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg">
+            <div className="flex items-center px-3 md:px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm md:text-base">
               <span className="font-medium">
                 {selectedCountText}
               </span>
@@ -166,6 +166,7 @@ export default function ReportsPage() {
           <Button
             onClick={openExportModal}
             disabled={purchases.length === 0}
+            className="w-full sm:w-auto"
           >
             {exportButtonText}
           </Button>

@@ -170,27 +170,25 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <div className="flex-1 flex flex-col">
-        <main className="flex-1">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Projects</h2>
-            {canCreate && !permissionsLoading && (
-              <Button onClick={() => {
-                if (!showForm) {
-                  setShowForm(true);
-                } else {
-                  handleCancelEdit();
-                }
-              }}>
-                {showForm ? 'Cancel' : 'New Project'}
-              </Button>
-            )}
-          </div>
+    <div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
+        <h2 className="text-xl md:text-2xl font-bold">Projects</h2>
+        {canCreate && !permissionsLoading && (
+          <Button onClick={() => {
+            if (!showForm) {
+              setShowForm(true);
+            } else {
+              handleCancelEdit();
+            }
+          }} className="w-full sm:w-auto">
+            {showForm ? 'Cancel' : 'New Project'}
+          </Button>
+        )}
+      </div>
 
-          {showForm && canCreate && (
-            <Card className="mb-6">
-              <h3 className="text-lg font-semibold mb-4">{editingProject ? 'Edit Project' : 'New Project'}</h3>
+      {showForm && canCreate && (
+        <Card className="mb-4 md:mb-6">
+          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">{editingProject ? 'Edit Project' : 'New Project'}</h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
@@ -361,14 +359,12 @@ export default function ProjectsPage() {
                   totalPages={pagination.totalPages}
                   totalItems={pagination.totalItems}
                   itemsPerPage={pagination.itemsPerPage}
-                  onPageChange={(page) => setPagination({ ...pagination, currentPage: page })}
-                  onItemsPerPageChange={(limit) => setPagination({ ...pagination, itemsPerPage: limit, currentPage: 1 })}
-                />
-              </>
-            )}
-          </Card>
-        </main>
-      </div>
+              onPageChange={(page) => setPagination({ ...pagination, currentPage: page })}
+              onItemsPerPageChange={(limit) => setPagination({ ...pagination, itemsPerPage: limit, currentPage: 1 })}
+            />
+          </>
+        )}
+      </Card>
     </div>
   );
 }

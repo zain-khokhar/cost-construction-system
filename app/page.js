@@ -121,18 +121,18 @@ export default function Dashboard() {
   }, [budgetData, summaryStats]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header with Filter */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-lg shadow-lg">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 md:p-6 rounded-lg shadow-lg">
         <div>
-          <h2 className="text-3xl font-bold mb-1">Project Dashboard</h2>
-          <p className="text-blue-100">Real-time construction cost analytics</p>
+          <h2 className="text-2xl md:text-3xl font-bold mb-1">Project Dashboard</h2>
+          <p className="text-sm md:text-base text-blue-100">Real-time construction cost analytics</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3 w-full sm:w-auto">
           <select
             value={selectedProject || ''}
             onChange={handleProjectChange}
-            className="bg-white text-gray-900 border-0 rounded-lg px-4 py-2.5 font-medium focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md"
+            className="flex-1 sm:flex-none bg-white text-gray-900 border-0 rounded-lg px-3 md:px-4 py-2 md:py-2.5 text-sm md:text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md"
           >
             <option value="">All Projects</option>
             {projects.map((project) => (
@@ -144,7 +144,7 @@ export default function Dashboard() {
           {selectedProject && (
             <button
               onClick={handleClearProject}
-              className="bg-blue-500 hover:bg-blue-400 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-md"
+              className="bg-blue-500 hover:bg-blue-400 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg text-sm md:text-base font-medium transition-colors shadow-md whitespace-nowrap"
             >
               Clear
             </button>
@@ -153,35 +153,35 @@ export default function Dashboard() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-r-lg shadow-md">
+        <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 md:px-6 py-3 md:py-4 rounded-r-lg shadow-md">
           <div className="flex items-center">
-            <svg className="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
-            <span>{error}</span>
+            <span className="text-sm md:text-base">{error}</span>
           </div>
         </div>
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-12 md:py-20">
           <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"></div>
-            <p className="text-gray-600 font-medium">Loading dashboard...</p>
+            <div className="inline-block animate-spin rounded-full h-10 w-10 md:h-12 md:w-12 border-4 border-blue-600 border-t-transparent mb-3 md:mb-4"></div>
+            <p className="text-gray-600 font-medium text-sm md:text-base">Loading dashboard...</p>
           </div>
         </div>
       ) : (
         <>
           {/* Summary Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-sm font-medium mb-1">Total Budget</p>
-                  <h3 className="text-3xl font-bold">${summaryStats.totalBudget.toLocaleString()}</h3>
+                  <p className="text-blue-100 text-xs md:text-sm font-medium mb-1">Total Budget</p>
+                  <h3 className="text-2xl md:text-3xl font-bold">${summaryStats.totalBudget.toLocaleString()}</h3>
                 </div>
-                <div className="bg-blue-400 bg-opacity-30 p-4 rounded-full">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-blue-400 bg-opacity-30 p-3 md:p-4 rounded-full">
+                  <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -191,11 +191,11 @@ export default function Dashboard() {
             <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-100 text-sm font-medium mb-1">Total Spent</p>
-                  <h3 className="text-3xl font-bold">${summaryStats.totalSpent.toLocaleString()}</h3>
+                  <p className="text-green-100 text-xs md:text-sm font-medium mb-1">Total Spent</p>
+                  <h3 className="text-2xl md:text-3xl font-bold">${summaryStats.totalSpent.toLocaleString()}</h3>
                 </div>
-                <div className="bg-green-400 bg-opacity-30 p-4 rounded-full">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-green-400 bg-opacity-30 p-3 md:p-4 rounded-full">
+                  <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
                 </div>
@@ -205,11 +205,11 @@ export default function Dashboard() {
             <Card className={`bg-gradient-to-br ${summaryStats.totalRemaining >= 0 ? 'from-teal-500 to-teal-600' : 'from-red-500 to-red-600'} text-white shadow-lg hover:shadow-xl transition-shadow`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`${summaryStats.totalRemaining >= 0 ? 'text-teal-100' : 'text-red-100'} text-sm font-medium mb-1`}>Remaining</p>
-                  <h3 className="text-3xl font-bold">${summaryStats.totalRemaining.toLocaleString()}</h3>
+                  <p className={`${summaryStats.totalRemaining >= 0 ? 'text-teal-100' : 'text-red-100'} text-xs md:text-sm font-medium mb-1`}>Remaining</p>
+                  <h3 className="text-2xl md:text-3xl font-bold">${summaryStats.totalRemaining.toLocaleString()}</h3>
                 </div>
-                <div className={`${summaryStats.totalRemaining >= 0 ? 'bg-teal-400' : 'bg-red-400'} bg-opacity-30 p-4 rounded-full`}>
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`${summaryStats.totalRemaining >= 0 ? 'bg-teal-400' : 'bg-red-400'} bg-opacity-30 p-3 md:p-4 rounded-full`}>
+                  <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
@@ -219,11 +219,11 @@ export default function Dashboard() {
             <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm font-medium mb-1">Avg Usage</p>
-                  <h3 className="text-3xl font-bold">{avgUsage}%</h3>
+                  <p className="text-purple-100 text-xs md:text-sm font-medium mb-1">Avg Usage</p>
+                  <h3 className="text-2xl md:text-3xl font-bold">{avgUsage}%</h3>
                 </div>
-                <div className="bg-purple-400 bg-opacity-30 p-4 rounded-full">
-                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-purple-400 bg-opacity-30 p-3 md:p-4 rounded-full">
+                  <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
@@ -233,13 +233,13 @@ export default function Dashboard() {
 
           {/* Project Cards */}
           <div>
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 flex items-center">
+              <svg className="w-5 h-5 md:w-6 md:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
               Project Overview
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {budgetData.map((project) => (
                 <Card 
                   key={project.projectId}
@@ -307,15 +307,15 @@ export default function Dashboard() {
 
           {/* Charts Section */}
           <div>
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <svg className="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 flex items-center">
+              <svg className="w-5 h-5 md:w-6 md:h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
               Analytics & Insights
             </h3>
             
             {/* First Row - Budget Progress and Utilization */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
               <Card title="Budget vs Actual Spending" className="shadow-lg">
                 {budgetData.length > 0 ? (
                   <BudgetProgressChart data={budgetData} />
@@ -370,7 +370,7 @@ export default function Dashboard() {
             </div>
 
             {/* Second Row - Phase Cost Trend */}
-            <div className="grid grid-cols-1 gap-6 mb-6">
+            <div className="grid grid-cols-1 gap-4 md:gap-6 mb-4 md:mb-6">
               <Card title="Phase Cost Trend Analysis" className="shadow-lg">
                 {phaseData.length > 0 ? (
                   <CostTrendChart data={phaseData} />
@@ -386,7 +386,7 @@ export default function Dashboard() {
             </div>
 
             {/* Third Row - Items and Vendors */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               <Card title="Top 5 Expensive Items" className="shadow-lg">
                 {itemData.length > 0 ? (
                   <ItemCostHorizontalChart data={itemData} />

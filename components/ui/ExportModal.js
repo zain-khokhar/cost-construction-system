@@ -96,10 +96,10 @@ export default function ExportModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
-      <Card className="max-w-md w-full mx-4">
-        <div className="p-6">
-          <h3 className="text-xl font-bold mb-4">{title}</h3>
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <Card className="max-w-md w-full">
+        <div className="p-4 md:p-6">
+          <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">{title}</h3>
           
           <div className="space-y-4">
             <div>
