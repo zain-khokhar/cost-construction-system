@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -12,21 +12,24 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
-  const [formData, setFormData] = useState({
+  
+  // FIXED: Separate state for profile and password forms
+  const [profileForm, setProfileForm] = useState({
     name: '',
     email: '',
+  });
+  
+  const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
+  
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
+  // Memoized fetch profile function
+  const fetchProfile = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/profile');
@@ -34,12 +37,9 @@ export default function ProfilePage() {
       
       if (data.ok) {
         setUser(data.data.user);
-        setFormData({
+        setProfileForm({
           name: data.data.user.name,
           email: data.data.user.email,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: '',
         });
       } else {
         setError(data.error?.message || 'Failed to load profile');
@@ -50,48 +50,22 @@ export default function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleSubmit = async (e) => {
+  // FIXED: Separate handler for profile update
+  const handleProfileUpdate = useCallback(async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    // Validate password change
-    if (changingPassword) {
-      if (!formData.currentPassword) {
-        setError('Current password is required');
-        return;
-      }
-      if (!formData.newPassword) {
-        setError('New password is required');
-        return;
-      }
-      if (formData.newPassword !== formData.confirmPassword) {
-        setError('Passwords do not match');
-        return;
-      }
-      if (formData.newPassword.length < 6) {
-        setError('Password must be at least 6 characters');
-        return;
-      }
-    }
-
     try {
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-      };
-
-      if (changingPassword) {
-        payload.currentPassword = formData.currentPassword;
-        payload.newPassword = formData.newPassword;
-      }
-
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          name: profileForm.name,
+          email: profileForm.email,
+        }),
       });
 
       const data = await res.json();
@@ -100,13 +74,6 @@ export default function ProfilePage() {
         setSuccess('Profile updated successfully');
         setUser(data.data.user);
         setEditing(false);
-        setChangingPassword(false);
-        setFormData({
-          ...formData,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: '',
-        });
       } else {
         setError(data.error?.message || 'Failed to update profile');
       }
@@ -114,7 +81,125 @@ export default function ProfilePage() {
       setError('Failed to update profile');
       console.error(err);
     }
-  };
+  }, [profileForm]);
+
+  // FIXED: Separate handler for password update
+  const handlePasswordUpdate = useCallback(async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    // Validate password change
+    if (!passwordForm.currentPassword) {
+      setError('Current password is required');
+      return;
+    }
+    if (!passwordForm.newPassword) {
+      setError('New password is required');
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: user.name, // Keep existing name
+          email: user.email, // Keep existing email
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        setSuccess('Password updated successfully');
+        setChangingPassword(false);
+        setPasswordForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+      } else {
+        setError(data.error?.message || 'Failed to update password');
+      }
+    } catch (err) {
+      setError('Failed to update password');
+      console.error(err);
+    }
+  }, [passwordForm, user]);
+
+  // Memoized change handlers for profile form
+  const handleProfileNameChange = useCallback((e) => {
+    setProfileForm(prev => ({ ...prev, name: e.target.value }));
+  }, []);
+
+  const handleProfileEmailChange = useCallback((e) => {
+    setProfileForm(prev => ({ ...prev, email: e.target.value }));
+  }, []);
+
+  // Memoized change handlers for password form
+  const handleCurrentPasswordChange = useCallback((e) => {
+    setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }));
+  }, []);
+
+  const handleNewPasswordChange = useCallback((e) => {
+    setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }));
+  }, []);
+
+  const handleConfirmPasswordChange = useCallback((e) => {
+    setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }));
+  }, []);
+
+  // Memoized button handlers
+  const handleEditProfile = useCallback(() => {
+    setEditing(true);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditing(false);
+    setProfileForm({
+      name: user.name,
+      email: user.email,
+    });
+    setError('');
+  }, [user]);
+
+  const handleStartPasswordChange = useCallback(() => {
+    setChangingPassword(true);
+  }, []);
+
+  const handleCancelPasswordChange = useCallback(() => {
+    setChangingPassword(false);
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setError('');
+  }, []);
+
+  const handleCopyCompanyId = useCallback(() => {
+    if (user?.company?._id) {
+      navigator.clipboard.writeText(user.company._id);
+      setSuccess('Company ID copied to clipboard!');
+      setTimeout(() => setSuccess(''), 3000);
+    }
+  }, [user]);
+
+  // Effect with proper dependency
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   if (loading) {
     return (
@@ -195,11 +280,7 @@ export default function ProfilePage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          navigator.clipboard.writeText(user.company._id);
-                          setSuccess('Company ID copied to clipboard!');
-                          setTimeout(() => setSuccess(''), 3000);
-                        }}
+                        onClick={handleCopyCompanyId}
                       >
                         Copy
                       </Button>
@@ -221,42 +302,32 @@ export default function ProfilePage() {
                   </p>
                 </div>
 
-                <Button onClick={() => setEditing(true)} className="mt-4">
+                <Button onClick={handleEditProfile} className="mt-4">
                   Edit Profile
                 </Button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleProfileUpdate} className="space-y-4">
                 <Input
                   label="Name"
                   type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  value={profileForm.name}
+                  onChange={handleProfileNameChange}
                   required
                 />
                 
                 <Input
                   label="Email"
                   type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  value={profileForm.email}
+                  onChange={handleProfileEmailChange}
                   required
                 />
 
                 <div className="flex gap-3 mt-6">
                   <Button
                     type="button"
-                    onClick={() => {
-                      setEditing(false);
-                      setFormData({
-                        name: user.name,
-                        email: user.email,
-                        currentPassword: '',
-                        newPassword: '',
-                        confirmPassword: '',
-                      });
-                      setError('');
-                    }}
+                    onClick={handleCancelEdit}
                     className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300"
                   >
                     Cancel
@@ -276,24 +347,24 @@ export default function ProfilePage() {
             <h3 className="text-xl font-semibold mb-4">Change Password</h3>
             
             {!changingPassword ? (
-              <Button onClick={() => setChangingPassword(true)}>
+              <Button onClick={handleStartPasswordChange}>
                 Change Password
               </Button>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handlePasswordUpdate} className="space-y-4">
                 <Input
                   label="Current Password"
                   type="password"
-                  value={formData.currentPassword}
-                  onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                  value={passwordForm.currentPassword}
+                  onChange={handleCurrentPasswordChange}
                   required
                 />
                 
                 <Input
                   label="New Password"
                   type="password"
-                  value={formData.newPassword}
-                  onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                  value={passwordForm.newPassword}
+                  onChange={handleNewPasswordChange}
                   required
                   minLength={6}
                 />
@@ -301,8 +372,8 @@ export default function ProfilePage() {
                 <Input
                   label="Confirm New Password"
                   type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  value={passwordForm.confirmPassword}
+                  onChange={handleConfirmPasswordChange}
                   required
                   minLength={6}
                 />
@@ -310,16 +381,7 @@ export default function ProfilePage() {
                 <div className="flex gap-3 mt-6">
                   <Button
                     type="button"
-                    onClick={() => {
-                      setChangingPassword(false);
-                      setFormData({
-                        ...formData,
-                        currentPassword: '',
-                        newPassword: '',
-                        confirmPassword: '',
-                      });
-                      setError('');
-                    }}
+                    onClick={handleCancelPasswordChange}
                     className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300"
                   >
                     Cancel

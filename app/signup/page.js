@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Input from '@/components/ui/Input';
@@ -24,16 +24,30 @@ export default function SignupPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleNext = () => {
+  // Memoized reusable change handler for all form inputs
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  // Memoized next step handler
+  const handleNext = useCallback(() => {
     if (!formData.name || !formData.email || !formData.password) {
       setError('Please fill in all required fields');
       return;
     }
     setError('');
     setStep(2);
-  };
+  }, [formData]);
 
-  const handleSubmit = async (e) => {
+  // Memoized back handler
+  const handleBack = useCallback(() => {
+    setStep(1);
+    setError('');
+  }, []);
+
+  // Memoized submit handler
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -92,7 +106,7 @@ export default function SignupPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -106,22 +120,25 @@ export default function SignupPage() {
             <div className="space-y-4">
               <Input
                 label="Full Name"
+                name="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={handleChange}
                 required
               />
               <Input
                 label="Email"
                 type="email"
+                name="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={handleChange}
                 required
               />
               <Input
                 label="Password"
                 type="password"
+                name="password"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={handleChange}
                 required
                 placeholder="Min 6 characters"
               />
@@ -149,9 +166,7 @@ export default function SignupPage() {
                       name="companyOption"
                       value="new"
                       checked={formData.companyOption === 'new'}
-                      onChange={(e) =>
-                        setFormData({ ...formData, companyOption: e.target.value })
-                      }
+                      onChange={handleChange}
                       className="text-blue-600"
                     />
                     <span className="text-sm">Create a new company</span>
@@ -162,9 +177,7 @@ export default function SignupPage() {
                       name="companyOption"
                       value="existing"
                       checked={formData.companyOption === 'existing'}
-                      onChange={(e) =>
-                        setFormData({ ...formData, companyOption: e.target.value })
-                      }
+                      onChange={handleChange}
                       className="text-blue-600"
                     />
                     <span className="text-sm">Join an existing company</span>
@@ -176,17 +189,17 @@ export default function SignupPage() {
                 <>
                   <Input
                     label="Company Name"
+                    name="companyName"
                     value={formData.companyName}
-                    onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                    onChange={handleChange}
                     required
                     placeholder="e.g., ABC Construction Co."
                   />
                   <Input
                     label="Company Domain (Optional)"
+                    name="companyDomain"
                     value={formData.companyDomain}
-                    onChange={(e) =>
-                      setFormData({ ...formData, companyDomain: e.target.value })
-                    }
+                    onChange={handleChange}
                     placeholder="e.g., abcconstruction.com"
                   />
                   <div className="bg-blue-50 border border-blue-200 rounded p-3">
@@ -200,15 +213,17 @@ export default function SignupPage() {
                 <>
                   <Input
                     label="Company ID"
+                    name="companyId"
                     value={formData.companyId}
-                    onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
+                    onChange={handleChange}
                     required
                     placeholder="Enter company ID provided by your administrator"
                   />
                   <Select
                     label="Your Role"
+                    name="role"
                     value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    onChange={handleChange}
                     options={[
                       { value: 'viewer', label: 'Viewer (Read Only)' },
                       { value: 'manager', label: 'Manager (Log Expenses)' },
@@ -232,10 +247,7 @@ export default function SignupPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => {
-                    setStep(1);
-                    setError('');
-                  }}
+                  onClick={handleBack}
                   className="flex-1"
                 >
                   Back
