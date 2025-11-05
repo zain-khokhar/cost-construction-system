@@ -34,6 +34,15 @@ async function handler(request) {
       },
     },
     { $sort: { _id: 1 } },
+    {
+      $project: {
+        _id: 0,
+        name: '$_id',
+        phaseName: '$_id',
+        totalCost: 1,
+        purchaseCount: 1,
+      },
+    },
   ]);
 
   return { summary };
