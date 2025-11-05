@@ -37,6 +37,16 @@ async function handler(request) {
     },
     { $sort: { totalCost: -1 } },
     { $limit: limit },
+    {
+      $project: {
+        _id: 0,
+        name: '$_id',
+        itemName: '$_id',
+        totalCost: 1,
+        totalQuantity: 1,
+        purchaseCount: 1,
+      },
+    },
   ]);
 
   return { breakdown };

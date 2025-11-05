@@ -4,6 +4,7 @@ import { ApiError } from '@/lib/errors';
 import { getUserFromRequest } from '@/lib/auth';
 import { ROLES } from '@/lib/roles';
 import Project from '@/models/Project';
+import Purchase from '@/models/Purchase';
 
 async function getProject(request, { params }) {
   const userPayload = getUserFromRequest(request);
@@ -74,11 +75,21 @@ async function deleteProject(request, { params }) {
   }
 
   const { id } = await params;
-  const project = await Project.findOneAndDelete({ _id: id, companyId: userPayload.companyId });
-
+  
+  // First check if project exists
+  const project = await Project.findOne({ _id: id, companyId: userPayload.companyId });
   if (!project) throw new ApiError('Project not found', 404);
 
-  return { message: 'Project deleted successfully' };
+  // Delete all purchases related to this project (cascade delete)
+  await Purchase.deleteMany({ projectId: id, companyId: userPayload.companyId });
+
+  // Delete the project
+  await Project.findOneAndDelete({ _id: id, companyId: userPayload.companyId });
+
+  return { 
+    message: 'Project and all related purchases deleted successfully',
+    deletedProject: project.name
+  };
 }
 
 export const GET = apiHandler(getProject);

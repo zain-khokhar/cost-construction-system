@@ -255,7 +255,7 @@ export default function ProjectsPage() {
                   <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
                     Cancel
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() => handleDelete(deleteConfirm)}
                     className="bg-red-600 hover:bg-red-700"
                   >

@@ -11,8 +11,22 @@ import Card from './Card';
  * @param {string} exportType - Type of export (items, categories, phases, vendors, purchases)
  * @param {string} projectId - Optional project ID for filtering
  * @param {string} title - Modal title
+ * @param {function} onExportData - Optional custom function to fetch export data (receives format as param)
+ * @param {object} exportParams - Optional additional params to pass to export API
+ * @param {array} selectedIds - Optional array of selected item IDs to export
+ * @param {boolean} exportAll - Optional flag to export all items across all pages
  */
-export default function ExportModal({ isOpen, onClose, exportType, projectId = null, title = 'Export Data' }) {
+export default function ExportModal({ 
+  isOpen, 
+  onClose, 
+  exportType, 
+  projectId = null, 
+  title = 'Export Data',
+  onExportData = null,
+  exportParams = {},
+  selectedIds = [],
+  exportAll = false
+}) {
   const [selectedFormat, setSelectedFormat] = useState('pdf');
   const [isExporting, setIsExporting] = useState(false);
 
@@ -21,10 +35,37 @@ export default function ExportModal({ isOpen, onClose, exportType, projectId = n
   const handleExport = async () => {
     setIsExporting(true);
     try {
+      // If custom export data function is provided, use it
+      if (onExportData) {
+        const data = await onExportData(selectedFormat);
+        if (!data || data.length === 0) {
+          alert('No data available to export');
+          return;
+        }
+        // Continue with default export flow using the data
+      }
+
       let url = `/api/export/${exportType}?format=${selectedFormat}`;
       if (projectId) {
         url += `&projectId=${projectId}`;
       }
+      
+      // Add exportAll flag if set
+      if (exportAll) {
+        url += `&exportAll=true`;
+      }
+      
+      // Add selectedIds if provided
+      if (selectedIds && selectedIds.length > 0 && !exportAll) {
+        url += `&selectedIds=${selectedIds.join(',')}`;
+      }
+      
+      // Add any additional export params
+      Object.entries(exportParams).forEach(([key, value]) => {
+        if (value) {
+          url += `&${key}=${encodeURIComponent(value)}`;
+        }
+      });
 
       const response = await fetch(url);
       
@@ -55,7 +96,7 @@ export default function ExportModal({ isOpen, onClose, exportType, projectId = n
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/70 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
       <Card className="max-w-md w-full mx-4">
         <div className="p-6">
           <h3 className="text-xl font-bold mb-4">{title}</h3>
