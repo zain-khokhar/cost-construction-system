@@ -103,7 +103,7 @@ export default function CategoryTab({
               data={categories}
               renderRow={(cat) => (
                 <>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <input
                       type="checkbox"
                       checked={selectedCategories.includes(cat._id)}
@@ -111,17 +111,17 @@ export default function CategoryTab({
                       className="rounded"
                     />
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="font-medium text-gray-900">{cat.name}</span>
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                       {cat.phaseId?.name || 'N/A'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 border-r border-gray-200">{cat.description || '—'}</td>
+                  <td className="px-6 max-sm:p-2 py-4 text-gray-600 border-r border-gray-200">{cat.description || '—'}</td>
                   {canEdit && (
-                    <td className="px-6 py-4">
+                    <td className="px-6 max-sm:p-2 py-4">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => onEdit && onEdit(cat)}

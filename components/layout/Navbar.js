@@ -57,7 +57,7 @@ export default function Navbar() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, action: 'approve' })
       });
-      
+
       if (res.ok) {
         await fetchPendingRequests();
         alert('User approved successfully!');
@@ -75,7 +75,7 @@ export default function Navbar() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, action: 'reject' })
       });
-      
+
       if (res.ok) {
         await fetchPendingRequests();
         alert('User rejected successfully!');
@@ -88,9 +88,9 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { 
+      await fetch('/api/auth/logout', {
         method: 'POST',
-        credentials: 'include' 
+        credentials: 'include'
       });
       // Force reload to clear cookie and redirect
       window.location.href = '/login';
@@ -132,7 +132,7 @@ export default function Navbar() {
                         <h3 className="font-semibold text-gray-900 text-sm md:text-base">Pending User Requests</h3>
                         <p className="text-xs md:text-sm text-gray-500">{pendingCount} users waiting for approval</p>
                       </div>
-                      
+
                       <div className="max-h-72 md:max-h-96 overflow-y-auto">
                         {pendingRequests.length === 0 ? (
                           <div className="p-4 text-center text-gray-500 text-sm">

@@ -7,16 +7,16 @@ import Select from '@/components/ui/Select';
 import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 
-export default function PhaseTab({ 
-  phases, 
-  showForm, 
-  formData, 
-  loading, 
-  canCreate, 
+export default function PhaseTab({
+  phases,
+  showForm,
+  formData,
+  loading,
+  canCreate,
   permissionsLoading,
   pagination,
-  onToggleForm, 
-  onFormChange, 
+  onToggleForm,
+  onFormChange,
   onSubmit,
   onPageChange,
   onItemsPerPageChange,
@@ -57,8 +57,8 @@ export default function PhaseTab({
               placeholder="Enter phase description"
             />
             <Button type="submit" disabled={loading}>
-              {loading 
-                ? (formData._id ? 'Updating...' : 'Creating...') 
+              {loading
+                ? (formData._id ? 'Updating...' : 'Creating...')
                 : (formData._id ? 'Update Phase' : 'Create Phase')}
             </Button>
           </form>
@@ -88,15 +88,15 @@ export default function PhaseTab({
                   onChange={(e) => onSelectAll && onSelectAll(e.target.checked)}
                   className="rounded"
                 />,
-                'Phase Name', 
-                'Description', 
+                'Phase Name',
+                'Description',
                 'Created Date',
                 ...(canEdit ? ['Actions'] : [])
               ]}
               data={phases}
               renderRow={(phase) => (
                 <>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <input
                       type="checkbox"
                       checked={selectedPhases.includes(phase._id)}
@@ -104,19 +104,19 @@ export default function PhaseTab({
                       className="rounded"
                     />
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="font-medium text-gray-900">{phase.name}</span>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 border-r border-gray-200">{phase.description || '—'}</td>
-                  <td className="px-6 py-4 text-gray-600 border-r border-gray-200">
-                    {new Date(phase.createdAt).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'short', 
-                      day: 'numeric' 
+                  <td className="px-6 max-sm:p-2 py-4 text-gray-600 border-r border-gray-200">{phase.description || '—'}</td>
+                  <td className="px-6 max-sm:p-2 py-4 text-gray-600 border-r border-gray-200">
+                    {new Date(phase.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
                     })}
                   </td>
                   {canEdit && (
-                    <td className="px-6 py-4">
+                    <td className="px-6 max-sm:p-2 py-4">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => onEdit && onEdit(phase)}
