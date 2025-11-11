@@ -127,7 +127,7 @@ export default function ItemTab({
               data={items}
               renderRow={(item) => (
                 <>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <input
                       type="checkbox"
                       checked={selectedItems.includes(item._id)}
@@ -135,23 +135,23 @@ export default function ItemTab({
                       className="rounded"
                     />
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="font-medium text-gray-900">{item.name}</span>
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                       {item.categoryId?.name || 'N/A'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 border-r border-gray-200">{item.unit}</td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 text-gray-600 border-r border-gray-200">{item.unit}</td>
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="font-semibold text-green-600">
                       ${parseFloat(item.ratePerUnit).toFixed(2)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 border-r border-gray-200">{item.defaultVendor?.name || '—'}</td>
+                  <td className="px-6 max-sm:p-2 py-4 text-gray-600 border-r border-gray-200">{item.defaultVendor?.name || '—'}</td>
                   {canEdit && (
-                    <td className="px-6 py-4">
+                    <td className="px-6 max-sm:p-2 py-4">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => onEdit && onEdit(item)}

@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
             {/* Main content area with margin for fixed sidebar */}
             <div className="flex-1 flex flex-col lg:ml-64">
               <Navbar />
-              <main className="flex-1 p-6">
+              <main className="flex-1">
                 {children}
               </main>
             </div>

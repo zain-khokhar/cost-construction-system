@@ -14,7 +14,7 @@ export default function ProjectHeader({ project, activeTab, onExport }) {
   };
 
   return (
-    <div className="bg-white shadow-sm rounded-lg p-6 mb-6">
+    <div className="bg-white shadow-sm rounded-lg p-6 max-sm:p-2 mb-6">
       <div className="flex justify-between items-start">
         <div className="flex-1">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">{project.name}</h2>

@@ -42,7 +42,7 @@ export default function Sidebar() {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-white border border-gray-200 shadow-md"
+        className={`lg:hidden fixed top-2 z-50 p-2 rounded-md bg-white border border-gray-200 shadow-md ${isOpen ? "left-48" : "left-4"}`}
         aria-label="Toggle menu"
       >
         <svg
@@ -65,7 +65,7 @@ export default function Sidebar() {
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-30"
+          className="lg:hidden fixed inset-0 bg-opacity-50 backdrop-blur-sm z-30"
           onClick={() => setIsOpen(false)}
         />
       )}
