@@ -1,7 +1,6 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import AppLayout from '@/components/layout/AppLayout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -13,7 +12,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   
-  // FIXED: Separate state for profile and password forms
+  // Separate state for profile and password forms
   const [profileForm, setProfileForm] = useState({
     name: '',
     email: '',
@@ -36,6 +35,7 @@ export default function ProfilePage() {
       const data = await res.json();
       
       if (data.ok) {
+        console.log('User data:', data.data.user); // Debug log
         setUser(data.data.user);
         setProfileForm({
           name: data.data.user.name,
@@ -52,28 +52,66 @@ export default function ProfilePage() {
     }
   }, []);
 
-  // FIXED: Separate handler for profile update
-  const handleProfileUpdate = useCallback(async (e) => {
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
+
+  // Profile form handlers
+  const handleNameChange = (e) => {
+    setProfileForm(prev => ({ ...prev, name: e.target.value }));
+  };
+
+  const handleEmailChange = (e) => {
+    setProfileForm(prev => ({ ...prev, email: e.target.value }));
+  };
+
+  const handleStartEdit = () => {
+    setEditing(true);
+    setError('');
+    setSuccess('');
+  };
+
+  const handleCancelEdit = () => {
+    setEditing(false);
+    setProfileForm({
+      name: user.name,
+      email: user.email,
+    });
+    setError('');
+    setSuccess('');
+  };
+
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    if (!profileForm.name.trim()) {
+      setError('Name is required');
+      return;
+    }
+
+    if (!profileForm.email.trim()) {
+      setError('Email is required');
+      return;
+    }
 
     try {
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: profileForm.name,
-          email: profileForm.email,
+          name: profileForm.name.trim(),
+          email: profileForm.email.trim(),
         }),
       });
 
       const data = await res.json();
 
       if (data.ok) {
-        setSuccess('Profile updated successfully');
-        setUser(data.data.user);
+        setUser(prev => ({ ...prev, ...data.data.user }));
         setEditing(false);
+        setSuccess('Profile updated successfully!');
       } else {
         setError(data.error?.message || 'Failed to update profile');
       }
@@ -81,39 +119,69 @@ export default function ProfilePage() {
       setError('Failed to update profile');
       console.error(err);
     }
-  }, [profileForm]);
+  };
 
-  // FIXED: Separate handler for password update
-  const handlePasswordUpdate = useCallback(async (e) => {
+  // Password form handlers
+  const handleCurrentPasswordChange = (e) => {
+    setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }));
+  };
+
+  const handleNewPasswordChange = (e) => {
+    setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }));
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }));
+  };
+
+  const handleStartPasswordChange = () => {
+    setChangingPassword(true);
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setError('');
+    setSuccess('');
+  };
+
+  const handleCancelPasswordChange = () => {
+    setChangingPassword(false);
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setError('');
+    setSuccess('');
+  };
+
+  const handlePasswordUpdate = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    // Validate password change
+    // Validation
     if (!passwordForm.currentPassword) {
       setError('Current password is required');
       return;
     }
-    if (!passwordForm.newPassword) {
-      setError('New password is required');
+
+    if (!passwordForm.newPassword || passwordForm.newPassword.length < 6) {
+      setError('New password must be at least 6 characters long');
       return;
     }
+
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    if (passwordForm.newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('New passwords do not match');
       return;
     }
 
     try {
-      const res = await fetch('/api/profile', {
+      const res = await fetch('/api/profile/password', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: user.name, // Keep existing name
-          email: user.email, // Keep existing email
           currentPassword: passwordForm.currentPassword,
           newPassword: passwordForm.newPassword,
         }),
@@ -122,13 +190,13 @@ export default function ProfilePage() {
       const data = await res.json();
 
       if (data.ok) {
-        setSuccess('Password updated successfully');
         setChangingPassword(false);
         setPasswordForm({
           currentPassword: '',
           newPassword: '',
           confirmPassword: '',
         });
+        setSuccess('Password updated successfully!');
       } else {
         setError(data.error?.message || 'Failed to update password');
       }
@@ -136,265 +204,193 @@ export default function ProfilePage() {
       setError('Failed to update password');
       console.error(err);
     }
-  }, [passwordForm, user]);
-
-  // Memoized change handlers for profile form
-  const handleProfileNameChange = useCallback((e) => {
-    setProfileForm(prev => ({ ...prev, name: e.target.value }));
-  }, []);
-
-  const handleProfileEmailChange = useCallback((e) => {
-    setProfileForm(prev => ({ ...prev, email: e.target.value }));
-  }, []);
-
-  // Memoized change handlers for password form
-  const handleCurrentPasswordChange = useCallback((e) => {
-    setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }));
-  }, []);
-
-  const handleNewPasswordChange = useCallback((e) => {
-    setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }));
-  }, []);
-
-  const handleConfirmPasswordChange = useCallback((e) => {
-    setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }));
-  }, []);
-
-  // Memoized button handlers
-  const handleEditProfile = useCallback(() => {
-    setEditing(true);
-  }, []);
-
-  const handleCancelEdit = useCallback(() => {
-    setEditing(false);
-    setProfileForm({
-      name: user.name,
-      email: user.email,
-    });
-    setError('');
-  }, [user]);
-
-  const handleStartPasswordChange = useCallback(() => {
-    setChangingPassword(true);
-  }, []);
-
-  const handleCancelPasswordChange = useCallback(() => {
-    setChangingPassword(false);
-    setPasswordForm({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    });
-    setError('');
-  }, []);
-
-  const handleCopyCompanyId = useCallback(() => {
-    if (user?.company?._id) {
-      navigator.clipboard.writeText(user.company._id);
-      setSuccess('Company ID copied to clipboard!');
-      setTimeout(() => setSuccess(''), 3000);
-    }
-  }, [user]);
-
-  // Effect with proper dependency
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+  };
 
   if (loading) {
     return (
-      <AppLayout>
-        <div className="text-center py-8">Loading...</div>
-      </AppLayout>
+      <div className="text-center py-8">Loading...</div>
     );
   }
 
   if (!user) {
     return (
-      <AppLayout>
-        <div className="text-center py-8 text-red-600">Failed to load profile</div>
-      </AppLayout>
+      <div className="text-center py-8 text-red-600">Failed to load profile</div>
     );
   }
 
   return (
-    <AppLayout>
-      <div className="max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6">Profile Settings</h2>
+    <div className="max-w-3xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6">Profile Settings</h2>
+      
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
+      {success && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
+          {success}
+        </div>
+      )}
 
-        {success && (
-          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-4">
-            {success}
-          </div>
-        )}
-
-        {/* User Information Card */}
-        <Card className="mb-6">
-          <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4">Personal Information</h3>
-            
-            {!editing ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Name</label>
-                  <p className="text-lg">{user.name}</p>
+      {/* Personal Information Card */}
+      <Card className="mb-6">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
+          
+          {!editing ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <p className="text-gray-900">{user.name}</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <p className="text-gray-900">{user.email}</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
+                    {getRoleDisplayName(user.role)}
+                  </span>
                 </div>
-                
+                <p className="text-sm text-gray-500 mt-1">{getRoleDescription(user.role)}</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                <p className="text-gray-900">{user.company?.name || 'N/A'}</p>
+              </div>
+              
+              {user.company && (
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Email</label>
-                  <p className="text-lg">{user.email}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Role</label>
-                  <div>
-                    <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                      {getRoleDisplayName(user.role)}
-                    </span>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {getRoleDescription(user.role)}
-                    </p>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Company ID (Share with new employees)</label>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="text" 
+                      value={user.company._id || user.company.id || 'Loading...'} 
+                      readOnly 
+                      className="flex-1 bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm font-mono"
+                    />
+                    <button
+                      onClick={() => {
+                        const companyId = user.company._id || user.company.id;
+                        if (companyId) {
+                          navigator.clipboard.writeText(companyId);
+                          setSuccess('Company ID copied to clipboard!');
+                          setTimeout(() => setSuccess(''), 3000);
+                        }
+                      }}
+                      className="px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                      Copy
+                    </button>
                   </div>
+                  <p className="text-xs text-blue-600 mt-1">Share this ID with employees who want to join your company during signup.</p>
                 </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Company</label>
-                  <p className="text-lg">{user.company?.name || 'N/A'}</p>
-                </div>
+              )}
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Member Since</label>
+                <p className="text-gray-900">{new Date(user.createdAt).toLocaleDateString()}</p>
+              </div>
+              
+              <Button onClick={handleStartEdit}>
+                Edit Profile
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={handleProfileUpdate} className="space-y-4">
+              <Input
+                label="Name"
+                type="text"
+                value={profileForm.name}
+                onChange={handleNameChange}
+                required
+              />
+              
+              <Input
+                label="Email"
+                type="email"
+                value={profileForm.email}
+                onChange={handleEmailChange}
+                required
+              />
 
-                {user.role === 'admin' && user.company?._id && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <label className="text-sm font-medium text-blue-900 block mb-2">
-                      Company ID (Share with new employees)
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 bg-white px-3 py-2 rounded border border-blue-300 font-mono text-sm">
-                        {user.company._id}
-                      </code>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleCopyCompanyId}
-                      >
-                        Copy
-                      </Button>
-                    </div>
-                    <p className="text-xs text-blue-700 mt-2">
-                      Share this ID with employees who want to join your company during signup.
-                    </p>
-                  </div>
-                )}
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Member Since</label>
-                  <p className="text-lg">
-                    {new Date(user.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
-                </div>
-
-                <Button onClick={handleEditProfile} className="mt-4">
-                  Edit Profile
+              <div className="flex gap-3 mt-6">
+                <Button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1">
+                  Save Changes
                 </Button>
               </div>
-            ) : (
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <Input
-                  label="Name"
-                  type="text"
-                  value={profileForm.name}
-                  onChange={handleProfileNameChange}
-                  required
-                />
-                
-                <Input
-                  label="Email"
-                  type="email"
-                  value={profileForm.email}
-                  onChange={handleProfileEmailChange}
-                  required
-                />
+            </form>
+          )}
+        </div>
+      </Card>
 
-                <div className="flex gap-3 mt-6">
-                  <Button
-                    type="button"
-                    onClick={handleCancelEdit}
-                    className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300"
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="flex-1">
-                    Save Changes
-                  </Button>
-                </div>
-              </form>
-            )}
-          </div>
-        </Card>
+      {/* Password Change Card */}
+      <Card>
+        <div className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Security</h3>
+          
+          {!changingPassword ? (
+            <Button onClick={handleStartPasswordChange}>
+              Change Password
+            </Button>
+          ) : (
+            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+              <Input
+                label="Current Password"
+                type="password"
+                value={passwordForm.currentPassword}
+                onChange={handleCurrentPasswordChange}
+                required
+              />
+              
+              <Input
+                label="New Password"
+                type="password"
+                value={passwordForm.newPassword}
+                onChange={handleNewPasswordChange}
+                required
+                minLength={6}
+              />
+              
+              <Input
+                label="Confirm New Password"
+                type="password"
+                value={passwordForm.confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                required
+                minLength={6}
+              />
 
-        {/* Change Password Card */}
-        <Card>
-          <div className="p-6">
-            <h3 className="text-xl font-semibold mb-4">Change Password</h3>
-            
-            {!changingPassword ? (
-              <Button onClick={handleStartPasswordChange}>
-                Change Password
-              </Button>
-            ) : (
-              <form onSubmit={handlePasswordUpdate} className="space-y-4">
-                <Input
-                  label="Current Password"
-                  type="password"
-                  value={passwordForm.currentPassword}
-                  onChange={handleCurrentPasswordChange}
-                  required
-                />
-                
-                <Input
-                  label="New Password"
-                  type="password"
-                  value={passwordForm.newPassword}
-                  onChange={handleNewPasswordChange}
-                  required
-                  minLength={6}
-                />
-                
-                <Input
-                  label="Confirm New Password"
-                  type="password"
-                  value={passwordForm.confirmPassword}
-                  onChange={handleConfirmPasswordChange}
-                  required
-                  minLength={6}
-                />
-
-                <div className="flex gap-3 mt-6">
-                  <Button
-                    type="button"
-                    onClick={handleCancelPasswordChange}
-                    className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300"
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="flex-1">
-                    Update Password
-                  </Button>
-                </div>
-              </form>
-            )}
-          </div>
-        </Card>
-      </div>
-    </AppLayout>
+              <div className="flex gap-3 mt-6">
+                <Button
+                  type="button"
+                  onClick={handleCancelPasswordChange}
+                  className="flex-1 bg-gray-200 text-gray-800 hover:bg-gray-300"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" className="flex-1">
+                  Update Password
+                </Button>
+              </div>
+            </form>
+          )}
+        </div>
+      </Card>
+    </div>
   );
 }

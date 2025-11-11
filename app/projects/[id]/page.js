@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { use } from 'react';
-import AppLayout from '@/components/layout/AppLayout';
 import ProjectHeader from '@/components/project/ProjectHeader';
 import ExportModal from '@/components/ui/ExportModal';
 import ConfirmModal from '@/components/ui/ConfirmModal';
@@ -147,14 +146,12 @@ export default function ProjectDetailPage({ params }) {
   // Loading state
   if (loading && !project) {
     return (
-      <AppLayout>
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading project...</p>
-          </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading project...</p>
         </div>
-      </AppLayout>
+      </div>
     );
   }
 
@@ -163,7 +160,7 @@ export default function ProjectDetailPage({ params }) {
   const error = dataError || formError;
 
   return (
-    <AppLayout>
+    <div>
       {/* Project Header */}
       <ProjectHeader
         project={project}
@@ -251,6 +248,6 @@ export default function ProjectDetailPage({ params }) {
         title={confirmState.title}
         message={confirmState.message}
       />
-    </AppLayout>
+    </div>
   );
 }

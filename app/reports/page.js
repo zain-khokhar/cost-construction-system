@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import AppLayout from '@/components/layout/AppLayout';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Table from '@/components/ui/Table';
@@ -152,7 +151,7 @@ export default function ReportsPage() {
   );
 
   return (
-    <AppLayout>
+    <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
         <h2 className="text-xl md:text-2xl font-bold">Reports</h2>
         <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full sm:w-auto">
@@ -245,7 +244,7 @@ export default function ReportsPage() {
         selectedIds={selectedPurchases}
         exportAll={selectAll}
       />
-    </AppLayout>
+    </div>
   );
 }
 
