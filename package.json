@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "seed": "node scripts/seed.js"
@@ -16,7 +16,7 @@
     "clsx": "^2.1.1",
     "cookie": "^1.0.2",
     "date-fns": "^4.1.0",
-    "dotenv": "^17.2.3",
+    "dotenv": "^16.4.5",
     "exceljs": "^4.4.0",
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -25,16 +25,18 @@
     "lucide-react": "^0.552.0",
     "mongoose": "^8.19.2",
     "next": "15.5.6",
-    "nodemailer": "^7.0.10",
+    "nodemailer": "^6.9.15",
     "pdfkit": "^0.17.2",
     "react": "19.1.0",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "19.1.0",
     "recharts": "^3.3.0",
-    "zod": "^4.1.12"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^15.5.6",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.6.2",
     "tailwindcss": "^4"
