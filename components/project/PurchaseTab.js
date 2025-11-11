@@ -157,7 +157,7 @@ export default function PurchaseTab({
               data={purchases}
               renderRow={(purchase) => (
                 <>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <input
                       type="checkbox"
                       checked={selectedPurchases.includes(purchase._id)}
@@ -165,26 +165,26 @@ export default function PurchaseTab({
                       className="rounded"
                     />
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="font-medium text-gray-900">{purchase.itemId?.name || 'N/A'}</span>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 text-gray-600 border-r border-gray-200">
                     {purchase.quantity} {purchase.itemId?.unit || 'units'}
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="text-gray-700">${parseFloat(purchase.pricePerUnit).toFixed(2)}</span>
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="font-semibold text-green-600">
                       ${purchase.totalCost.toLocaleString()}
                     </span>
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
                       {purchase.vendorId?.name || 'N/A'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-gray-600 border-r border-gray-200">
+                  <td className="px-6 max-sm:p-2 py-4 text-gray-600 border-r border-gray-200">
                     {new Date(purchase.purchaseDate).toLocaleDateString('en-US', { 
                       year: 'numeric', 
                       month: 'short', 
@@ -192,7 +192,7 @@ export default function PurchaseTab({
                     })}
                   </td>
                   {canEdit && (
-                    <td className="px-6 py-4">
+                    <td className="px-6 max-sm:p-2 py-4">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => onEdit && onEdit(purchase)}
