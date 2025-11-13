@@ -15,6 +15,35 @@ import {
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Helper function to handle rate limiting and retries
+async function generateWithRetry(model, prompt, maxRetries = 1) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const result = await model.generateContent(prompt);
+      return result.response.text();
+    } catch (error) {
+      console.error(`AI generation attempt ${i + 1} failed:`, error.message);
+      
+      // Check for quota exhaustion (limit: 0 means quota is used up)
+      if (error.message.includes('limit: 0') || error.message.includes('quota')) {
+        throw new Error('QUOTA_EXHAUSTED');
+      }
+      
+      // If it's a rate limit error and not the last retry
+      if (error.message.includes('Too Many Requests') && i < maxRetries - 1) {
+        console.log('Rate limit hit, waiting before retry...');
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Reduced wait time
+        continue;
+      }
+      
+      // If all retries failed or non-rate-limit error, throw the error
+      if (i === maxRetries - 1) {
+        throw error;
+      }
+    }
+  }
+}
+
 /**
  * AI Chatbot API endpoint
  * Processes natural language queries using Google Gemini AI
@@ -214,25 +243,45 @@ Format with markdown headers, bullet points, bold numbers. Include insights. Und
         data = vendors;
         
         if (vendors.length === 0) {
-          const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
-          const prompt = `No vendor spending data found. Generate a helpful response. Under 30 words.`;
-          const result = await model.generateContent(prompt);
-          response = result.response.text();
+          response = "No vendor spending data found in your system. Try adding some purchases with vendors first, then ask me again!";
         } else {
-          const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
-          const vendorsList = vendors.slice(0, 5).map((v, i) => 
-            `${i + 1}. ${v.name}: $${v.totalSpent.toLocaleString()} (${v.purchaseCount} purchases) - Items: ${[...new Set(v.items)].slice(0, 3).join(', ')}`
-          ).join('\n');
-          
-          const prompt = `Generate a vendor spending analysis for:
+          // Try AI first, but fall back to formatted data if AI is unavailable
+          try {
+            const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
+            const vendorsList = vendors.slice(0, 5).map((v, i) => 
+              `${i + 1}. ${v.name}: $${v.totalSpent.toLocaleString()} (${v.purchaseCount} purchases) - Items: ${[...new Set(v.items)].slice(0, 3).join(', ')}`
+            ).join('\n');
+            
+            const prompt = `Generate a vendor spending analysis for:
 
 ${vendorsList}
 ${vendors.length > 5 ? `...and ${vendors.length - 5} more vendors` : ''}
 
 Format with markdown, numbered list, bold for vendor names and amounts. Under 150 words.`;
-          
-          const result = await model.generateContent(prompt);
-          response = result.response.text();
+            
+            response = await generateWithRetry(model, prompt);
+            
+            // If AI returned the fallback message, provide formatted data instead
+            if (response.includes("high demand") || response.includes("try your request again")) {
+              throw new Error("AI unavailable, using fallback");
+            }
+          } catch (aiError) {
+            // Fallback: Return formatted vendor data without AI
+            response = `## 📊 Vendor Spending Analysis\n\n`;
+            vendors.slice(0, 10).forEach((vendor, i) => {
+              response += `**${i + 1}. ${vendor.name}**\n`;
+              response += `- Total Spent: **$${vendor.totalSpent.toLocaleString()}**\n`;
+              response += `- Purchases: ${vendor.purchaseCount}\n`;
+              response += `- Top Items: ${[...new Set(vendor.items)].slice(0, 3).join(', ')}\n\n`;
+            });
+            
+            if (vendors.length > 10) {
+              response += `*...and ${vendors.length - 10} more vendors*\n\n`;
+            }
+            
+            const totalSpent = vendors.reduce((sum, v) => sum + v.totalSpent, 0);
+            response += `**Total Vendor Spending: $${totalSpent.toLocaleString()}**`;
+          }
         }
         break;
       }
@@ -348,10 +397,10 @@ Generate a friendly apology and suggest:
 
 Keep it under 50 words and helpful.`;
       
-      const result = await model.generateContent(prompt);
+      const aiResponse = await generateWithRetry(model, prompt);
       
       return {
-        message: result.response.text(),
+        message: aiResponse,
         data: null,
         intent: 'error',
         timestamp: new Date().toISOString()
