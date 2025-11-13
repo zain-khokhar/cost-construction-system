@@ -3,7 +3,8 @@
 import './globals.css';
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
-import Sidebar from '@/components/layout/Sidebar';
+import Sidebar, { SidebarProvider } from '@/components/layout/Sidebar';
+import MainContent from '@/components/layout/MainContent';
 import AIChatbot from '@/components/AIChatbot';
 
 export default function RootLayout({ children }) {
@@ -21,18 +22,20 @@ export default function RootLayout({ children }) {
           children
         ) : (
           // Authenticated pages with Sidebar/Navbar
-          <div className="flex min-h-screen">
-            <Sidebar />
-            {/* Main content area with margin for fixed sidebar */}
-            <div className="flex-1 flex flex-col lg:ml-64">
-              <Navbar />
-              <main className="flex-1">
-                {children}
-              </main>
+          <SidebarProvider>
+            <div className="flex min-h-screen">
+              <Sidebar />
+              {/* Main content area with responsive margin for sidebar */}
+              <MainContent>
+                <Navbar />
+                <main className="flex-1">
+                  {children}
+                </main>
+              </MainContent>
+              {/* AI Chatbot - Available on all authenticated pages */}
+              <AIChatbot />
             </div>
-            {/* AI Chatbot - Available on all authenticated pages */}
-            <AIChatbot />
-          </div>
+          </SidebarProvider>
         )}
       </body>
     </html>

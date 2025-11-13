@@ -170,7 +170,7 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6 max-w-7xl mx-auto">
+    <div className="p-3 sm:p-4 lg:p-6 max-w-7xl">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
         <div>

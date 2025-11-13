@@ -4,7 +4,30 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
+
+// Create sidebar context
+const SidebarContext = createContext();
+
+// Hook to use sidebar context
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within SidebarProvider');
+  }
+  return context;
+};
+
+// Sidebar provider component
+export function SidebarProvider({ children }) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  return (
+    <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed }}>
+      {children}
+    </SidebarContext.Provider>
+  );
+}
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: '/dashboard.ico' },
@@ -16,7 +39,8 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { isCollapsed, setIsCollapsed } = useSidebar();
   const [companyName, setCompanyName] = useState(null);
   const [mounted, setMounted] = useState(false);
 
@@ -42,8 +66,8 @@ export default function Sidebar() {
     <>
       {/* Mobile menu button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`lg:hidden fixed top-2 z-50 p-2 rounded-md bg-white border border-gray-200 shadow-md ${isOpen ? "left-48" : "left-4"}`}
+        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        className={`lg:hidden fixed top-2 z-50 p-2 rounded-md bg-white border border-gray-200 shadow-md ${isMobileOpen ? "left-48" : "left-4"}`}
         aria-label="Toggle menu"
       >
         <svg
@@ -55,7 +79,7 @@ export default function Sidebar() {
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          {isOpen ? (
+          {isMobileOpen ? (
             <path d="M6 18L18 6M6 6l12 12" />
           ) : (
             <path d="M4 6h16M4 12h16M4 18h16" />
@@ -63,27 +87,46 @@ export default function Sidebar() {
         </svg>
       </button>
 
+      {/* Desktop collapse toggle */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className={`hidden lg:flex fixed top-4 z-50 p-2 rounded-md bg-blue-800 hover:bg-blue-700 text-white shadow-lg transition-all duration-300 ${
+          isCollapsed ? 'left-20' : 'left-60'
+        }`}
+        aria-label="Toggle sidebar"
+      >
+        <svg
+          className={`w-5 h-5 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
       {/* Overlay for mobile */}
-      {isOpen && (
+      {isMobileOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-30"
-          onClick={() => setIsOpen(false)}
+          onClick={() => setIsMobileOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
         className={clsx(
-          'fixed top-0 left-0 h-screen bg-blue-900 border-r border-blue-800 transition-transform duration-300 z-40',
-          'w-64',
-          // Mobile: slide in/out
-          isOpen ? 'translate-x-0' : '-translate-x-full',
-          // Desktop: always visible
-          'lg:translate-x-0'
+          'fixed top-0 left-0 h-screen bg-blue-900 border-r border-blue-800 transition-all duration-300 z-40 overflow-hidden',
+          // Mobile: fixed width, slide in/out
+          'lg:relative',
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+          // Desktop: dynamic width based on collapsed state
+          isCollapsed ? 'lg:w-16' : 'lg:w-64',
+          'w-64' // Mobile always full width
         )}
       >
         {/* Company Name Header - Only render after mount to avoid hydration mismatch */}
-        {mounted && companyName && (
+        {mounted && companyName && !isCollapsed && (
           <div className="px-4 md:px-6 py-4 md:py-5 border-b border-blue-800">
             <h2 className="text-base md:text-lg font-bold text-white truncate">
               {companyName}
@@ -92,28 +135,63 @@ export default function Sidebar() {
           </div>
         )}
 
-        <nav className="p-3 md:p-4 overflow-y-auto" style={{ height: mounted && companyName ? 'calc(100vh - 80px)' : '100vh' }}>
+        {/* Collapsed header - just logo/icon */}
+        {mounted && isCollapsed && (
+          <div className="px-3 py-4 border-b border-blue-800 flex justify-center">
+            <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">C</span>
+            </div>
+          </div>
+        )}
+
+        <nav className={clsx(
+          "p-3 md:p-4 overflow-y-auto transition-all duration-300",
+          isCollapsed ? "px-2" : "px-3 md:px-4"
+        )} style={{ 
+          height: mounted && companyName ? 'calc(100vh - 80px)' : '100vh' 
+        }}>
           <ul className="space-y-1 md:space-y-2">
             {navItems.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => setIsMobileOpen(false)}
                   className={clsx(
-                    'flex items-center gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded hover:bg-blue-800 transition-colors text-sm md:text-base',
+                    'flex items-center rounded hover:bg-blue-800 transition-all duration-300 text-sm md:text-base group relative',
+                    isCollapsed ? 'px-2 py-3 justify-center min-h-[48px]' : 'px-3 md:px-4 py-2 md:py-2.5 gap-3',
                     pathname === item.href ? 'bg-blue-700 text-white font-medium' : 'text-blue-100 hover:text-white'
                   )}
+                  title={isCollapsed ? item.label : undefined}
                 >
                   {item.icon.startsWith('/') ? (
                     <img 
                       src={item.icon} 
                       alt={item.label} 
-                      className="w-5 h-5 md:w-6 md:h-6 brightness-0 invert"
+                      className={clsx(
+                        "brightness-0 invert transition-all duration-300 flex-shrink-0",
+                        isCollapsed ? "w-10 h-5" : "w-5 h-5 md:w-6 md:h-6"
+                      )}
                     />
                   ) : (
-                    <span className="text-lg md:text-xl">{item.icon}</span>
+                    <span className={clsx(
+                      "transition-all duration-300 flex-shrink-0",
+                      isCollapsed ? "text-2xl" : "text-lg md:text-xl"
+                    )}>{item.icon}</span>
                   )}
-                  <span>{item.label}</span>
+                  
+                  {/* Label - hidden when collapsed on desktop */}
+                  {!isCollapsed && (
+                    <span className="transition-all duration-300 whitespace-nowrap">
+                      {item.label}
+                    </span>
+                  )}
+
+                  {/* Tooltip for collapsed state */}
+                  {isCollapsed && (
+                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 hidden lg:block">
+                      {item.label}
+                    </div>
+                  )}
                 </Link>
               </li>
             ))}
