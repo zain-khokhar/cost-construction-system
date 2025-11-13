@@ -139,9 +139,9 @@ export default function Sidebar() {
       )}
 
       {/* Sidebar */}
-      <aside
+      <aside 
         className={clsx(
-          'fixed top-0 left-0 h-screen bg-blue-900 border-r border-blue-800 transition-all duration-300 z-40 overflow-hidden flex flex-col',
+          'fixed top-0 left-0 h-screen bg-blue-900 border-r border-blue-800 transition-all duration-300 z-40 flex flex-col overflow-x-hidden',
           // Mobile: fixed width, slide in/out
           'lg:relative',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
@@ -170,7 +170,7 @@ export default function Sidebar() {
         )}
 
         <nav className={clsx(
-          "overflow-y-auto transition-all duration-300 flex-1",
+          "overflow-y-auto overflow-x-hidden transition-all duration-300 flex-1",
           isCollapsed ? "px-2" : "px-3 md:px-4"
         )}>
           <div className="py-3 md:py-4">
@@ -193,13 +193,13 @@ export default function Sidebar() {
                       alt={item.label} 
                       className={clsx(
                         "brightness-0 invert transition-all duration-300 flex-shrink-0 quality-100",
-                        isCollapsed ? "w-10 h-auto" : "w-5 h-5 md:w-6 md:h-6"
+                        isCollapsed ? "w-6 h-6" : "w-5 h-5 md:w-6 md:h-6"
                       )}
                     />
                   ) : (
                     <span className={clsx(
                       "transition-all duration-300 flex-shrink-0",
-                      isCollapsed ? "text-2xl" : "text-lg md:text-xl"
+                      isCollapsed ? "text-xl" : "text-lg md:text-xl"
                     )}>{item.icon}</span>
                   )}
                   
@@ -212,7 +212,7 @@ export default function Sidebar() {
 
                   {/* Tooltip for collapsed state */}
                   {isCollapsed && (
-                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 hidden lg:block">
+                    <div className="absolute left-16 ml-1 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50 hidden lg:block">
                       {item.label}
                     </div>
                   )}

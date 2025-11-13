@@ -103,7 +103,7 @@ export default function Navbar() {
     <header className="bg-white border-b border-gray-200 px-3 md:px-6 py-3 md:py-4 sticky top-0 z-20">
       <div className="flex justify-between items-center">
         <h1 className="text-base md:text-xl font-bold text-gray-900 ml-12 lg:ml-0 truncate">
-          <span className="hidden sm:inline">Construction Cost Management</span>
+          <span className="ml-10 hidden sm:inline">Construction Cost Management</span>
           <span className="sm:hidden">CCM</span>
         </h1>
         <div className="flex items-center gap-2 md:gap-4">
