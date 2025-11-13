@@ -23,12 +23,12 @@ export default function RootLayout({ children }) {
         ) : (
           // Authenticated pages with Sidebar/Navbar
           <SidebarProvider>
-            <div className="flex min-h-screen">
+            <div className="flex h-screen overflow-hidden">
               <Sidebar />
               {/* Main content area with responsive margin for sidebar */}
               <MainContent>
                 <Navbar />
-                <main className="flex-1">
+                <main className="flex-1 overflow-y-auto">
                   {children}
                 </main>
               </MainContent>

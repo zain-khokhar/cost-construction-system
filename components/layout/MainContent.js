@@ -7,7 +7,7 @@ export default function MainContent({ children }) {
   const { isCollapsed } = useSidebar();
 
   return (
-    <div className="flex-1 flex flex-col transition-all duration-300">
+    <div className="flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300">
       {children}
     </div>
   );

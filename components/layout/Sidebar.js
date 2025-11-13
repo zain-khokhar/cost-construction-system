@@ -116,7 +116,7 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={clsx(
-          'fixed top-0 left-0 h-screen bg-blue-900 border-r border-blue-800 transition-all duration-300 z-40 overflow-hidden',
+          'fixed top-0 left-0 h-screen bg-blue-900 border-r border-blue-800 transition-all duration-300 z-40 overflow-hidden flex flex-col',
           // Mobile: fixed width, slide in/out
           'lg:relative',
           isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
@@ -145,12 +145,11 @@ export default function Sidebar() {
         )}
 
         <nav className={clsx(
-          "p-3 md:p-4 overflow-y-auto transition-all duration-300",
+          "overflow-y-auto transition-all duration-300 flex-1",
           isCollapsed ? "px-2" : "px-3 md:px-4"
-        )} style={{ 
-          height: mounted && companyName ? 'calc(100vh - 80px)' : '100vh' 
-        }}>
-          <ul className="space-y-1 md:space-y-2">
+        )}>
+          <div className="py-3 md:py-4">
+            <ul className="space-y-1 md:space-y-2">
             {navItems.map((item) => (
               <li key={item.href}>
                 <Link
@@ -196,6 +195,7 @@ export default function Sidebar() {
               </li>
             ))}
           </ul>
+          </div>
         </nav>
       </aside>
     </>
