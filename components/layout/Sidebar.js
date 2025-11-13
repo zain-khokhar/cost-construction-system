@@ -21,24 +21,30 @@ export const useSidebar = () => {
 // Sidebar provider component
 export function SidebarProvider({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [mounted, setMounted] = useState(()=>{
-      const saved = localStorage.getItem('sidebarCollapsed');
-  return saved ? JSON.parse(saved) : false;
-  });
+  const [mounted, setMounted] = useState(false);
 
   // Load saved state on mount
   useEffect(() => {
     setMounted(true);
-    const savedState = localStorage.getItem('sidebarCollapsed');
-    if (savedState !== null) {
-      setIsCollapsed(JSON.parse(savedState));
+    if (typeof window !== 'undefined') {
+      const savedState = localStorage.getItem('sidebarCollapsed');
+      if (savedState !== null) {
+        try {
+          setIsCollapsed(JSON.parse(savedState));
+        } catch (error) {
+          console.error('Error parsing sidebar state:', error);
+          localStorage.removeItem('sidebarCollapsed');
+        }
+      }
     }
   }, []);
 
   // Save state when it changes
   const handleSetCollapsed = (collapsed) => {
     setIsCollapsed(collapsed);
-    localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
+    }
   };
   
   return (
