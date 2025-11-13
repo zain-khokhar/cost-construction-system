@@ -21,9 +21,28 @@ export const useSidebar = () => {
 // Sidebar provider component
 export function SidebarProvider({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(()=>{
+      const saved = localStorage.getItem('sidebarCollapsed');
+  return saved ? JSON.parse(saved) : false;
+  });
+
+  // Load saved state on mount
+  useEffect(() => {
+    setMounted(true);
+    const savedState = localStorage.getItem('sidebarCollapsed');
+    if (savedState !== null) {
+      setIsCollapsed(JSON.parse(savedState));
+    }
+  }, []);
+
+  // Save state when it changes
+  const handleSetCollapsed = (collapsed) => {
+    setIsCollapsed(collapsed);
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(collapsed));
+  };
   
   return (
-    <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed }}>
+    <SidebarContext.Provider value={{ isCollapsed, setIsCollapsed: handleSetCollapsed, mounted }}>
       {children}
     </SidebarContext.Provider>
   );
@@ -40,7 +59,7 @@ const navItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const { isCollapsed, setIsCollapsed } = useSidebar();
+  const { isCollapsed, setIsCollapsed, mounted: sidebarMounted } = useSidebar();
   const [companyName, setCompanyName] = useState(null);
   const [mounted, setMounted] = useState(false);
 
@@ -126,7 +145,7 @@ export default function Sidebar() {
         )}
       >
         {/* Company Name Header - Only render after mount to avoid hydration mismatch */}
-        {mounted && companyName && !isCollapsed && (
+        {sidebarMounted && mounted && companyName && !isCollapsed && (
           <div className="px-4 md:px-6 py-4 md:py-5 border-b border-blue-800">
             <h2 className="text-base md:text-lg font-bold text-white truncate">
               {companyName}
@@ -136,7 +155,7 @@ export default function Sidebar() {
         )}
 
         {/* Collapsed header - just logo/icon */}
-        {mounted && isCollapsed && (
+        {sidebarMounted && mounted && isCollapsed && (
           <div className="px-3 py-4 border-b border-blue-800 flex justify-center">
             <div className="w-8 h-8 bg-blue-700 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">C</span>
@@ -167,8 +186,8 @@ export default function Sidebar() {
                       src={item.icon} 
                       alt={item.label} 
                       className={clsx(
-                        "brightness-0 invert transition-all duration-300 flex-shrink-0",
-                        isCollapsed ? "w-10 h-5" : "w-5 h-5 md:w-6 md:h-6"
+                        "brightness-0 invert transition-all duration-300 flex-shrink-0 quality-100",
+                        isCollapsed ? "w-10 h-auto" : "w-5 h-5 md:w-6 md:h-6"
                       )}
                     />
                   ) : (
