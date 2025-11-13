@@ -1,16 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { useState, useEffect } from 'react';
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: '📊' },
-  { href: '/projects', label: 'Projects', icon: '🏗️' },
-  { href: '/vendors', label: 'Vendors', icon: '🤝' },
-  { href: '/reports', label: 'Reports', icon: '📈' },
-  { href: '/profile', label: 'Profile', icon: '👤' },
+  { href: '/', label: 'Dashboard', icon: '/dashboard.ico' },
+  { href: '/projects', label: 'Projects', icon: '/layers.ico' },
+  { href: '/vendors', label: 'Vendors', icon: '/vendor.ico' },
+  { href: '/reports', label: 'Reports', icon: '/report_1.ico' },
+  { href: '/profile', label: 'Profile', icon: '/user.ico' },
 ];
 
 export default function Sidebar() {
@@ -65,7 +66,7 @@ export default function Sidebar() {
       {/* Overlay for mobile */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-opacity-50 backdrop-blur-sm z-30"
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-30"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -73,7 +74,7 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={clsx(
-          'fixed top-0 left-0 h-screen bg-white border-r border-gray-200 transition-transform duration-300 z-40',
+          'fixed top-0 left-0 h-screen bg-blue-900 border-r border-blue-800 transition-transform duration-300 z-40',
           'w-64',
           // Mobile: slide in/out
           isOpen ? 'translate-x-0' : '-translate-x-full',
@@ -83,11 +84,11 @@ export default function Sidebar() {
       >
         {/* Company Name Header - Only render after mount to avoid hydration mismatch */}
         {mounted && companyName && (
-          <div className="px-4 md:px-6 py-4 md:py-5 border-b border-gray-200">
-            <h2 className="text-base md:text-lg font-bold text-gray-900 truncate">
+          <div className="px-4 md:px-6 py-4 md:py-5 border-b border-blue-800">
+            <h2 className="text-base md:text-lg font-bold text-white truncate">
               {companyName}
             </h2>
-            <p className="text-xs text-gray-600 mt-1">Construction Management</p>
+            <p className="text-xs text-blue-200 mt-1">Construction Management</p>
           </div>
         )}
 
@@ -99,11 +100,19 @@ export default function Sidebar() {
                   href={item.href}
                   onClick={() => setIsOpen(false)}
                   className={clsx(
-                    'flex items-center gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded hover:bg-gray-100 transition-colors text-sm md:text-base',
-                    pathname === item.href ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'
+                    'flex items-center gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded hover:bg-blue-800 transition-colors text-sm md:text-base',
+                    pathname === item.href ? 'bg-blue-700 text-white font-medium' : 'text-blue-100 hover:text-white'
                   )}
                 >
-                  <span className="text-lg md:text-xl">{item.icon}</span>
+                  {item.icon.startsWith('/') ? (
+                    <img 
+                      src={item.icon} 
+                      alt={item.label} 
+                      className="w-5 h-5 md:w-6 md:h-6 brightness-0 invert"
+                    />
+                  ) : (
+                    <span className="text-lg md:text-xl">{item.icon}</span>
+                  )}
                   <span>{item.label}</span>
                 </Link>
               </li>

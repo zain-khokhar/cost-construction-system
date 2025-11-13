@@ -192,7 +192,7 @@ export default function AIChatbot() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 flex items-center justify-center z-50"
+          className="fixed bottom-4 right-4 md:bottom-6 md:right-6 w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-900 to-blue-800 text-white rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 flex items-center justify-center z-50"
           aria-label="Open AI Chat"
         >
           <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
@@ -203,7 +203,7 @@ export default function AIChatbot() {
       {isOpen && (
         <div className="fixed bottom-0 right-0 md:bottom-6 md:right-6 w-full h-full md:w-96 md:h-[600px] md:max-h-[80vh] bg-white md:rounded-lg shadow-2xl flex flex-col z-50 border-t md:border border-gray-200">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 md:px-4 py-3 md:rounded-t-lg flex items-center justify-between">
+          <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white px-3 md:px-4 py-3 md:rounded-t-lg flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MessageCircle className="w-4 h-4 md:w-5 md:h-5" />
               <h3 className="font-semibold text-sm md:text-base">AI Assistant</h3>

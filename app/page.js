@@ -123,10 +123,10 @@ export default function Dashboard() {
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Header with Filter */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 md:p-6 rounded-lg shadow-lg">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 md:gap-4 bg-gradient-to-r from-blue-900 to-blue-800 text-white p-4 md:p-6 rounded-lg shadow-lg">
         <div>
           <h2 className="text-2xl md:text-3xl font-bold mb-1">Project Dashboard</h2>
-          <p className="text-sm md:text-base text-blue-100">Real-time construction cost analytics</p>
+          <p className="text-sm md:text-base text-blue-200">Real-time construction cost analytics</p>
         </div>
         <div className="flex items-center gap-2 md:gap-3 w-full sm:w-auto">
           <select
@@ -174,13 +174,13 @@ export default function Dashboard() {
         <>
           {/* Summary Statistics Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-shadow">
+            <Card className="bg-gradient-to-br text-white shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-xs md:text-sm font-medium mb-1">Total Budget</p>
-                  <h3 className="text-2xl md:text-3xl font-bold">${summaryStats.totalBudget.toLocaleString()}</h3>
+                  <p className="text-black text-xs md:text-sm font-medium mb-1">Total Budget</p>
+                  <h3 className="text-2xl text-black md:text-3xl font-bold">${summaryStats.totalBudget.toLocaleString()}</h3>
                 </div>
-                <div className="bg-blue-400 bg-opacity-30 p-3 md:p-4 rounded-full">
+                <div className="bg-blue-900 bg-opacity-30 p-3 md:p-4 rounded-full">
                   <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -188,13 +188,13 @@ export default function Dashboard() {
               </div>
             </Card>
 
-            <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl transition-shadow">
+            <Card className="text-white shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-100 text-xs md:text-sm font-medium mb-1">Total Spent</p>
-                  <h3 className="text-2xl md:text-3xl font-bold">${summaryStats.totalSpent.toLocaleString()}</h3>
+                  <p className="text-black text-xs md:text-sm font-medium mb-1">Total Spent</p>
+                  <h3 className="text-2xl md:text-3xl font-bold text-black">${summaryStats.totalSpent.toLocaleString()}</h3>
                 </div>
-                <div className="bg-green-400 bg-opacity-30 p-3 md:p-4 rounded-full">
+                <div className="bg-blue-900 bg-opacity-30 p-3 md:p-4 rounded-full">
                   <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
@@ -202,13 +202,13 @@ export default function Dashboard() {
               </div>
             </Card>
 
-            <Card className={`bg-gradient-to-br ${summaryStats.totalRemaining >= 0 ? 'from-teal-500 to-teal-600' : 'from-red-500 to-red-600'} text-white shadow-lg hover:shadow-xl transition-shadow`}>
+            <Card className={`bg-gradient-to-br ${summaryStats.totalRemaining >= 0 ? '' : 'from-red-500 to-red-600'} text-white shadow-lg hover:shadow-xl transition-shadow`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`${summaryStats.totalRemaining >= 0 ? 'text-teal-100' : 'text-red-100'} text-xs md:text-sm font-medium mb-1`}>Remaining</p>
-                  <h3 className="text-2xl md:text-3xl font-bold">${summaryStats.totalRemaining.toLocaleString()}</h3>
+                  <p className={`${summaryStats.totalRemaining >= 0 ? 'text-black' : 'text-red-100'} text-xs md:text-sm font-medium mb-1`}>Remaining</p>
+                  <h3 className="text-2xl md:text-3xl font-bold text-black">${summaryStats.totalRemaining.toLocaleString()}</h3>
                 </div>
-                <div className={`${summaryStats.totalRemaining >= 0 ? 'bg-teal-400' : 'bg-red-400'} bg-opacity-30 p-3 md:p-4 rounded-full`}>
+                <div className={`${summaryStats.totalRemaining >= 0 ? 'bg-blue-900' : 'bg-red-400'} bg-opacity-30 p-3 md:p-4 rounded-full`}>
                   <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
@@ -216,13 +216,13 @@ export default function Dashboard() {
               </div>
             </Card>
 
-            <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-shadow">
+            <Card className="bg-gradient-to-br text-white shadow-lg hover:shadow-xl transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-xs md:text-sm font-medium mb-1">Avg Usage</p>
-                  <h3 className="text-2xl md:text-3xl font-bold">{avgUsage}%</h3>
+                  <p className="text-black text-xs md:text-sm font-medium mb-1">Avg Usage</p>
+                  <h3 className="text-2xl  text-black md:text-3xl font-bold">{avgUsage}%</h3>
                 </div>
-                <div className="bg-purple-400 bg-opacity-30 p-3 md:p-4 rounded-full">
+                <div className="bg-blue-900 bg-opacity-30 p-3 md:p-4 rounded-full">
                   <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
