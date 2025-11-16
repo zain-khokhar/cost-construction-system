@@ -396,7 +396,7 @@ export default function ProjectDetailPage({ params }) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-shrink-0 px-6 py-3 capitalize font-medium transition-all whitespace-nowrap ${activeTab === tab.id
+              className={`shrink-0 px-6 py-3 capitalize font-medium transition-all whitespace-nowrap ${activeTab === tab.id
                   ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }`}

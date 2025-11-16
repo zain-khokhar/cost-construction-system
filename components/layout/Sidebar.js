@@ -183,7 +183,7 @@ export default function Sidebar() {
                   onClick={() => setIsMobileOpen(false)}
                   className={clsx(
                     'flex items-center rounded hover:bg-blue-800 transition-all duration-300 text-sm md:text-base group relative',
-                    isCollapsed ? 'px-2 py-3 justify-center min-h-[48px]' : 'px-3 md:px-4 py-2 md:py-2.5 gap-3',
+                    isCollapsed ? 'px-2 py-3 justify-center min-h-12' : 'px-3 md:px-4 py-2 md:py-2.5 gap-3',
                     pathname === item.href ? 'bg-blue-700 text-white font-medium' : 'text-blue-100 hover:text-white'
                   )}
                   title={isCollapsed ? item.label : undefined}
@@ -193,13 +193,13 @@ export default function Sidebar() {
                       src={item.icon} 
                       alt={item.label} 
                       className={clsx(
-                        "brightness-0 invert transition-all duration-300 flex-shrink-0 quality-100",
+                        "brightness-0 invert transition-all duration-300 shrink-0 quality-100",
                         isCollapsed ? "w-6 h-6" : "w-5 h-5 md:w-6 md:h-6"
                       )}
                     />
                   ) : (
                     <span className={clsx(
-                      "transition-all duration-300 flex-shrink-0",
+                      "transition-all duration-300 shrink-0",
                       isCollapsed ? "text-xl" : "text-lg md:text-xl"
                     )}>{item.icon}</span>
                   )}

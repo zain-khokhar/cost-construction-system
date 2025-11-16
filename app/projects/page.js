@@ -450,7 +450,7 @@ export default function ProjectsPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => router.push(`/projects/${project._id}`)}
-                          className="flex-1 min-w-[80px]"
+                          className="flex-1 min-w-20"
                         >
                           View
                         </Button>
@@ -460,7 +460,7 @@ export default function ProjectsPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleEdit(project)}
-                              className="flex-1 min-w-[80px]"
+                              className="flex-1 min-w-20"
                             >
                               Edit
                             </Button>
@@ -468,7 +468,7 @@ export default function ProjectsPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => setDeleteConfirm(project._id)}
-                              className="flex-1 min-w-[80px] text-red-600 hover:text-red-700 hover:border-red-300"
+                              className="flex-1 min-w-20 text-red-600 hover:text-red-700 hover:border-red-300"
                             >
                               Delete
                             </Button>
