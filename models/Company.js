@@ -31,6 +31,12 @@ const companySchema = new mongoose.Schema(
       of: String,
       default: {},
     },
+    defaultCurrency: {
+      type: String,
+      default: 'USD',
+      trim: true,
+      uppercase: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

@@ -3,10 +3,11 @@
 import { useMemo } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-export default function BudgetUtilizationChart({ data }) {
+export default function BudgetUtilizationChart({ data, currency = 'USD' }) {
   const { chartData, totalBudget, totalSpent } = useMemo(() => {
     // Calculate overall budget utilization
     const totalBudget = data.reduce((sum, p) => sum + (p.budget || 0), 0);
@@ -68,7 +69,7 @@ export default function BudgetUtilizationChart({ data }) {
             const label = context.label || '';
             const value = context.parsed;
             const percentage = ((value / totalBudget) * 100).toFixed(1);
-            return label + ': $' + value.toLocaleString() + ' (' + percentage + '%)';
+            return label + ': ' + getCurrencySymbol(currency) + value.toLocaleString() + ' (' + percentage + '%)';
           },
         },
         backgroundColor: 'rgba(0, 0, 0, 0.8)',

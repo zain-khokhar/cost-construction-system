@@ -11,10 +11,11 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export default function BudgetProgressChart({ data }) {
+export default function BudgetProgressChart({ data, currency = 'USD' }) {
   const chartData = useMemo(() => ({
     labels: data.map((item) => item.projectName),
     datasets: [
@@ -65,7 +66,7 @@ export default function BudgetProgressChart({ data }) {
       tooltip: {
         callbacks: {
           label: function (context) {
-            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+            return context.dataset.label + ': ' + getCurrencySymbol(currency) + context.parsed.y.toLocaleString();
           },
         },
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -80,7 +81,7 @@ export default function BudgetProgressChart({ data }) {
         beginAtZero: true,
         ticks: {
           callback: function (value) {
-            return '$' + value.toLocaleString();
+            return getCurrencySymbol(currency) + value.toLocaleString();
           },
           font: { size: 11 },
         },

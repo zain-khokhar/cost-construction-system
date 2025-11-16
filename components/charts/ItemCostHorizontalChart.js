@@ -11,10 +11,11 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export default function ItemCostHorizontalChart({ data }) {
+export default function ItemCostHorizontalChart({ data, currency = 'USD' }) {
   const chartData = useMemo(() => ({
     labels: data.map((item) => item.itemName || item.name),
     datasets: [
@@ -64,7 +65,7 @@ export default function ItemCostHorizontalChart({ data }) {
       tooltip: {
         callbacks: {
           label: function (context) {
-            return 'Cost: $' + context.parsed.x.toLocaleString();
+            return 'Cost: ' + getCurrencySymbol(currency) + context.parsed.x.toLocaleString();
           },
         },
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -79,7 +80,7 @@ export default function ItemCostHorizontalChart({ data }) {
         beginAtZero: true,
         ticks: {
           callback: function (value) {
-            return '$' + value.toLocaleString();
+            return getCurrencySymbol(currency) + value.toLocaleString();
           },
           font: { size: 11 },
         },

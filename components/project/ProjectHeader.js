@@ -1,6 +1,7 @@
 'use client';
 
 import Button from '@/components/ui/Button';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
 export default function ProjectHeader({ project, activeTab, onExport }) {
   const getExportButtonText = () => {
@@ -32,7 +33,7 @@ export default function ProjectHeader({ project, activeTab, onExport }) {
             <div className="flex items-center gap-2">
               <span className="font-medium">Budget:</span>
               <span className="text-green-600 font-semibold">
-                ${project.totalBudget?.toLocaleString()}
+                {getCurrencySymbol(project.currency || 'USD')}{project.totalBudget?.toLocaleString()}
               </span>
             </div>
           </div>

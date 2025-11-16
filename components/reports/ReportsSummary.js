@@ -1,6 +1,8 @@
 'use client';
 
-export default function ReportsSummary({ summary, totalRecords, projectBudgets, hasProjectFilter }) {
+import { getCurrencySymbol } from '@/lib/utils/currencies';
+
+export default function ReportsSummary({ summary, totalRecords, projectBudgets, hasProjectFilter, currency = 'USD' }) {
   const { totalSpending, totalBudget, remainingBudget } = summary;
   const isOverBudget = remainingBudget < 0;
   const budgetUtilization = totalBudget > 0 ? (totalSpending / totalBudget) * 100 : 0;
@@ -18,7 +20,7 @@ export default function ReportsSummary({ summary, totalRecords, projectBudgets, 
         <div className="bg-white p-4 rounded-lg shadow-sm">
           <p className="text-sm text-gray-600 mb-1">Total Spending</p>
           <p className="text-2xl font-bold text-blue-600">
-            ${totalSpending.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {getCurrencySymbol(currency)}{totalSpending.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </p>
         </div>
 
@@ -29,13 +31,13 @@ export default function ReportsSummary({ summary, totalRecords, projectBudgets, 
               Project Budget{projectBudgets?.length > 1 ? 's' : ''}
             </p>
             <p className="text-2xl font-bold text-gray-900">
-              ${totalBudget.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {getCurrencySymbol(currency)}{totalBudget.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
             {projectBudgets && projectBudgets.length > 0 && (
               <div className="mt-2 space-y-1 max-h-20 overflow-y-auto">
                 {projectBudgets.map((project, idx) => (
                   <p key={idx} className="text-xs text-gray-500">
-                    {project.name}: ${project.budget.toLocaleString()}
+                    {project.name}: {getCurrencySymbol(project.currency || currency)}{project.budget.toLocaleString()}
                   </p>
                 ))}
               </div>
@@ -57,7 +59,7 @@ export default function ReportsSummary({ summary, totalRecords, projectBudgets, 
               {isOverBudget ? 'Over Budget' : 'Remaining Budget'}
             </p>
             <p className={`text-2xl font-bold ${isOverBudget ? 'text-red-600' : 'text-green-600'}`}>
-              ${Math.abs(remainingBudget).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {getCurrencySymbol(currency)}{Math.abs(remainingBudget).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         ) : (
@@ -95,7 +97,7 @@ export default function ReportsSummary({ summary, totalRecords, projectBudgets, 
       {hasProjectFilter && isOverBudget && (
         <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-800">
-            <strong>⚠️ Warning:</strong> Total spending has exceeded the allocated budget by ${Math.abs(remainingBudget).toLocaleString()}.
+            <strong>⚠️ Warning:</strong> Total spending has exceeded the allocated budget by {getCurrencySymbol(currency)}{Math.abs(remainingBudget).toLocaleString()}.
           </p>
         </div>
       )}

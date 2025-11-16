@@ -155,7 +155,7 @@ export default function Dashboard() {
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 md:px-6 py-3 md:py-4 rounded-r-lg shadow-md">
           <div className="flex items-center">
-            <svg className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 md:w-6 md:h-6 mr-2 md:mr-3 shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
             <span className="text-sm md:text-base">{error}</span>
@@ -318,7 +318,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
               <Card title="Budget vs Actual Spending" className="shadow-lg">
                 {budgetData.length > 0 ? (
-                  <BudgetProgressChart data={budgetData} />
+                  <BudgetProgressChart data={budgetData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -373,7 +373,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 gap-4 md:gap-6 mb-4 md:mb-6">
               <Card title="Phase Cost Trend Analysis" className="shadow-lg">
                 {phaseData.length > 0 ? (
-                  <CostTrendChart data={phaseData} />
+                  <CostTrendChart data={phaseData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,7 +389,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               <Card title="Top 5 Expensive Items" className="shadow-lg">
                 {itemData.length > 0 ? (
-                  <ItemCostHorizontalChart data={itemData} />
+                  <ItemCostHorizontalChart data={itemData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,7 +402,7 @@ export default function Dashboard() {
 
               <Card title="Vendor Spend Distribution" className="shadow-lg">
                 {vendorData.length > 0 ? (
-                  <VendorSpendPieChart data={vendorData} />
+                  <VendorSpendPieChart data={vendorData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
