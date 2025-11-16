@@ -91,9 +91,10 @@ async function handler(request) {
           const availablePhases = await Phase.find({ companyId }).select('name').limit(5);
           const phasesList = availablePhases.map(p => p.name).join(', ');
           
-          // Use Gemini to generate a helpful response
-          const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
-          const prompt = `User asked: "${message}" trying to find phase "${parsed.phase}"
+          try {
+            // Use Gemini to generate a helpful response
+            const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
+            const prompt = `User asked: "${message}" trying to find phase "${parsed.phase}"
 
 We couldn't find that phase. ${availablePhases.length > 0 ? `Available phases are: ${phasesList}` : 'No phases found in the system.'}
 
@@ -103,15 +104,29 @@ Generate a friendly, helpful response that:
 3. Suggests they try one of the available options
 
 Keep it under 60 words and conversational. Use bullet points for phase names.`;
-          const result = await model.generateContent(prompt);
-          response = result.response.text();
+            const result = await model.generateContent(prompt);
+            response = result.response.text();
+          } catch (aiError) {
+            // Fallback when AI is unavailable
+            response = `❌ **Phase "${parsed.phase}" not found**\n\n`;
+            if (availablePhases.length > 0) {
+              response += `**Available phases:**\n`;
+              availablePhases.forEach(phase => {
+                response += `• ${phase.name}\n`;
+              });
+              response += `\nTry asking about one of these phases instead!`;
+            } else {
+              response += `No phases found in your system. Create some phases first, then ask me again!`;
+            }
+          }
         } else {
-          // Use Gemini to generate a natural response with the data
-          const utilization = ((phaseData.spent / phaseData.budget) * 100).toFixed(1);
-          const status = utilization > 90 ? 'high' : utilization > 70 ? 'moderate' : 'good';
-          
-          const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
-          const prompt = `You're analyzing construction phase spending. Generate a clear, professional response:
+          try {
+            // Use Gemini to generate a natural response with the data
+            const utilization = ((phaseData.spent / phaseData.budget) * 100).toFixed(1);
+            const status = utilization > 90 ? 'high' : utilization > 70 ? 'moderate' : 'good';
+            
+            const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
+            const prompt = `You're analyzing construction phase spending. Generate a clear, professional response:
 
 Phase: ${phaseData.phaseName}
 Budget: $${phaseData.budget.toLocaleString()}
@@ -127,9 +142,30 @@ Format requirements:
 - Include brief insight about spending status
 - Use markdown bold for numbers
 - Keep under 80 words`;
-          
-          const result = await model.generateContent(prompt);
-          response = result.response.text();
+            
+            const result = await model.generateContent(prompt);
+            response = result.response.text();
+          } catch (aiError) {
+            // Fallback when AI is unavailable
+            const utilization = ((phaseData.spent / phaseData.budget) * 100).toFixed(1);
+            const emoji = utilization > 90 ? '🔴' : utilization > 70 ? '🟡' : '🟢';
+            const status = utilization > 90 ? 'High' : utilization > 70 ? 'Moderate' : 'Good';
+            
+            response = `## ${emoji} **${phaseData.phaseName} Phase**\n\n`;
+            response += `**Budget:** $${phaseData.budget.toLocaleString()}\n`;
+            response += `**Spent:** $${phaseData.spent.toLocaleString()}\n`;
+            response += `**Remaining:** $${phaseData.remaining.toLocaleString()}\n`;
+            response += `**Utilization:** ${utilization}% (${status})\n`;
+            response += `**Purchases:** ${phaseData.purchaseCount}\n\n`;
+            
+            if (utilization > 90) {
+              response += `⚠️ Budget utilization is high - monitor spending closely.`;
+            } else if (utilization > 70) {
+              response += `✅ Budget utilization is moderate - on track.`;
+            } else {
+              response += `✅ Budget utilization is healthy - good spending control.`;
+            }
+          }
         }
         break;
       }
@@ -142,8 +178,9 @@ Format requirements:
         data = { purchases, total: purchases.reduce((sum, p) => sum + p.totalCost, 0) };
         
         if (purchases.length === 0) {
-          const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
-          const prompt = `User asked: "${message}"
+          try {
+            const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
+            const prompt = `User asked: "${message}"
 
 No purchases found for "${parsed.item || 'items'}"${parsed.currentMonth ? ' this month' : ''}.
 
@@ -153,16 +190,22 @@ Generate a helpful response:
 3. Offer to show all recent purchases
 
 Keep conversational and under 40 words.`;
-          const result = await model.generateContent(prompt);
-          response = result.response.text();
+            const result = await model.generateContent(prompt);
+            response = result.response.text();
+          } catch (aiError) {
+            response = `❌ **No purchases found**\n\n`;
+            response += `No records found for "${parsed.item || 'items'}"${parsed.currentMonth ? ' this month' : ''}.\n\n`;
+            response += `**Try:**\n• Check item name spelling\n• Use broader search terms\n• Ask for "all purchases" to see available items`;
+          }
         } else {
-          const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
-          const topPurchases = purchases.slice(0, 5);
-          const purchasesList = topPurchases.map(p => 
-            `• ${p.item}: ${p.quantity} ${p.unit} × $${p.pricePerUnit.toLocaleString()} = $${p.totalCost.toLocaleString()} - ${p.vendor} (${p.project})`
-          ).join('\n');
-          
-          const prompt = `Analyze these construction purchase records:
+          try {
+            const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
+            const topPurchases = purchases.slice(0, 5);
+            const purchasesList = topPurchases.map(p => 
+              `• ${p.item}: ${p.quantity} ${p.unit} × $${p.pricePerUnit.toLocaleString()} = $${p.totalCost.toLocaleString()} - ${p.vendor} (${p.project})`
+            ).join('\n');
+            
+            const prompt = `Analyze these construction purchase records:
 
 Item: ${parsed.item || 'Various items'}
 Time Period: ${parsed.currentMonth ? 'This month' : 'All time'}
@@ -181,9 +224,28 @@ Format requirements:
 - Add brief insight (e.g., top vendor, average cost trend)
 - Include emoji 📦 for items
 - Keep under 120 words`;
-          
-          const result = await model.generateContent(prompt);
-          response = result.response.text();
+            
+            const result = await model.generateContent(prompt);
+            response = result.response.text();
+          } catch (aiError) {
+            // Fallback when AI is unavailable
+            response = `## 📦 **${parsed.item || 'Item'} Purchases**\n\n`;
+            response += `**Found:** ${purchases.length} purchases\n`;
+            response += `**Total Cost:** $${data.total.toLocaleString()}\n`;
+            response += `**Average:** $${(data.total / purchases.length).toLocaleString()} per purchase\n\n`;
+            
+            const topPurchases = purchases.slice(0, 5);
+            response += `**Top Purchases:**\n`;
+            topPurchases.forEach((p, i) => {
+              response += `${i + 1}. **${p.item}**\n`;
+              response += `   ${p.quantity} ${p.unit} × $${p.pricePerUnit.toLocaleString()} = $${p.totalCost.toLocaleString()}\n`;
+              response += `   Vendor: ${p.vendor} | Project: ${p.project}\n\n`;
+            });
+            
+            if (purchases.length > 5) {
+              response += `*...and ${purchases.length - 5} more purchases*`;
+            }
+          }
         }
         break;
       }
@@ -272,14 +334,15 @@ Format with markdown, numbered list, bold for vendor names and amounts. Under 15
               response += `**${i + 1}. ${vendor.name}**\n`;
               response += `- Total Spent: **$${vendor.totalSpent.toLocaleString()}**\n`;
               response += `- Purchases: ${vendor.purchaseCount}\n`;
-              response += `- Top Items: ${[...new Set(vendor.items)].slice(0, 3).join(', ')}\n\n`;
+              const uniqueItems = [...new Set(vendor.items)].slice(0, 3);
+              response += `- Top Items: ${uniqueItems.length > 0 ? uniqueItems.join(', ') : 'N/A'}\n\n`;
             });
             
             if (vendors.length > 10) {
               response += `*...and ${vendors.length - 10} more vendors*\n\n`;
             }
             
-            const totalSpent = vendors.reduce((sum, v) => sum + v.totalSpent, 0);
+            const totalSpent = vendors.reduce((sum, v) => sum + (v.totalSpent || 0), 0);
             response += `**Total Vendor Spending: $${totalSpent.toLocaleString()}**`;
           }
         }
