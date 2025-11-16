@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 // Ensure User model is registered before using ref: 'User' in this schema
-import './User';
+import './User.js';
 
 const purchaseSchema = new mongoose.Schema(
   {

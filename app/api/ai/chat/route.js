@@ -243,7 +243,7 @@ Format with markdown headers, bullet points, bold numbers. Include insights. Und
         data = vendors;
         
         if (vendors.length === 0) {
-          response = "No vendor spending data found in your system. Try adding some purchases with vendors first, then ask me again!";
+          response = "No vendor spending data found in your system. This could mean:\n\n• No purchases have been recorded yet\n• Purchases don't have vendor information\n• No vendors match your search criteria\n\nTry adding some purchases with vendors first, then ask me again!";
         } else {
           // Try AI first, but fall back to formatted data if AI is unavailable
           try {
@@ -303,12 +303,13 @@ Generate a helpful response that:
           const result = await model.generateContent(prompt);
           response = result.response.text();
         } else if (Array.isArray(summary)) {
-          const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
-          const projectsList = summary.map((p, i) => 
-            `${i + 1}. ${p.name}: Budget $${p.budget.toLocaleString()}, Spent $${p.spent.toLocaleString()} (${p.percentUsed}%), ${p.phaseCount} phases, Status: ${p.status}`
-          ).join('\n');
-          
-          const prompt = `Generate a comprehensive summary for all construction projects:
+          try {
+            const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
+            const projectsList = summary.map((p, i) => 
+              `${i + 1}. ${p.name || 'Unknown'}: Budget $${(p.budget || 0).toLocaleString()}, Spent $${(p.spent || 0).toLocaleString()} (${p.percentUsed || '0'}%), ${p.phaseCount || 0} phases, Status: ${p.status || 'unknown'}`
+            ).join('\n');
+            
+            const prompt = `Generate a comprehensive summary for all construction projects:
 
 ${projectsList}
 
@@ -319,15 +320,36 @@ Format requirements:
 - Add emoji status indicators (🟢 good, 🟡 moderate, 🔴 high)
 - Include brief overall insight
 - Keep under 200 words`;
-          
-          const result = await model.generateContent(prompt);
-          response = result.response.text();
+            
+            const result = await model.generateContent(prompt);
+            response = result.response.text();
+          } catch (aiError) {
+            // Fallback response when AI fails
+            response = `## 📋 **Found ${summary.length} Projects**\n\n`;
+            summary.forEach((p, i) => {
+              const utilization = parseFloat(p.percentUsed || '0');
+              const status = utilization > 90 ? '🔴' : utilization > 70 ? '🟡' : '🟢';
+              response += `**${i + 1}. ${status} ${p.name || 'Unknown Project'}**\n`;
+              response += `- Budget: $${(p.budget || 0).toLocaleString()}\n`;
+              response += `- Spent: $${(p.spent || 0).toLocaleString()} (${p.percentUsed || '0'}%)\n`;
+              response += `- Phases: ${p.phaseCount || 0}, Status: ${p.status || 'unknown'}\n\n`;
+            });
+            
+            const totalBudget = summary.reduce((sum, p) => sum + (p.budget || 0), 0);
+            const totalSpent = summary.reduce((sum, p) => sum + (p.spent || 0), 0);
+            response += `**Total Portfolio: $${totalSpent.toLocaleString()} / $${totalBudget.toLocaleString()}**`;
+          }
         } else {
-          const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
-          const utilization = parseFloat(summary.percentUsed);
-          const status = utilization > 90 ? '🔴 High' : utilization > 70 ? '🟡 Moderate' : '🟢 Good';
-          
-          const prompt = `Generate a detailed project summary for:
+          // Validate summary data before using it
+          if (!summary.name || summary.budget === undefined || summary.spent === undefined) {
+            response = `❌ Project data incomplete. Found project but missing key information like budget or spending data.`;
+          } else {
+            try {
+              const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
+              const utilization = parseFloat(summary.percentUsed || '0');
+              const status = utilization > 90 ? '🔴 High' : utilization > 70 ? '🟡 Moderate' : '🟢 Good';
+              
+              const prompt = `Generate a detailed project summary for:
 
 Project: ${summary.name}
 Budget: $${summary.budget.toLocaleString()}
@@ -343,9 +365,27 @@ Format requirements:
 - Add status emoji
 - Include actionable insight
 - Keep under 100 words`;
-          
-          const result = await model.generateContent(prompt);
-          response = result.response.text();
+              
+              const result = await model.generateContent(prompt);
+              response = result.response.text();
+            } catch (aiError) {
+              // Fallback response when AI fails
+              const utilization = parseFloat(summary.percentUsed || '0');
+              const status = utilization > 90 ? '🔴' : utilization > 70 ? '🟡' : '🟢';
+              
+              response = `## ${status} **${summary.name}**
+
+**Budget:** $${summary.budget.toLocaleString()}
+**Spent:** $${summary.spent.toLocaleString()} (${summary.percentUsed}%)
+**Remaining:** $${summary.remaining.toLocaleString()}
+**Phases:** ${summary.phaseCount}
+**Status:** ${summary.status}
+
+${utilization > 90 ? 'Budget utilization is high - monitor spending closely.' : 
+  utilization > 70 ? 'Budget utilization is moderate - on track.' : 
+  'Budget utilization is healthy - good spending control.'}`;
+            }
+          }
         }
         break;
       }
@@ -385,33 +425,25 @@ Generate a helpful, friendly response explaining what you can help with. Include
       parsed
     });
     
-    // Return a user-friendly error with the AI
-    try {
-      const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp' });
-      const prompt = `The user asked: "${message}" but we encountered a technical error. 
-
-Generate a friendly apology and suggest:
-1. Try rephrasing the question
-2. Check if the data exists
-3. Use simpler terms
-
-Keep it under 50 words and helpful.`;
-      
-      const aiResponse = await generateWithRetry(model, prompt);
-      
+    // Check for quota exhaustion first
+    if (error.message === 'QUOTA_EXHAUSTED' || error.message.includes('quota') || error.message.includes('limit: 0')) {
       return {
-        message: aiResponse,
+        message: '🤖 **AI Service Temporarily Unavailable**\n\nOur AI assistant has reached its usage limit. Your data is still accessible, but AI-generated responses are temporarily disabled.\n\n**What you can still do:**\n• View raw data in tables and charts\n• Export reports\n• Browse project details\n\nAI functionality will resume automatically. Thank you for your patience!',
         data: null,
-        intent: 'error',
+        intent: 'quota_error',
         timestamp: new Date().toISOString()
       };
-    } catch (aiError) {
-      console.error('AI Error handling failed:', aiError);
-      return NextResponse.json(
-        { ok: false, error: 'Failed to process your query. Please try again.' },
-        { status: 500 }
-      );
     }
+    
+    // Return a user-friendly error for other issues
+    const fallbackMessage = `❌ **Unable to process your query**\n\nSorry, I encountered a technical issue while processing: "${message}"\n\n**Please try:**\n• Rephrasing your question\n• Using simpler terms\n• Checking if the data exists in your system\n\nFor example: "Show vendor spending" or "List project summary"`;
+    
+    return {
+      message: fallbackMessage,
+      data: null,
+      intent: 'error',
+      timestamp: new Date().toISOString()
+    };
   }
 }
 
