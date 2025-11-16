@@ -318,7 +318,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
               <Card title="Budget vs Actual Spending" className="shadow-lg">
                 {budgetData.length > 0 ? (
-                  <BudgetProgressChart data={budgetData} />
+                  <BudgetProgressChart data={budgetData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -373,7 +373,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 gap-4 md:gap-6 mb-4 md:mb-6">
               <Card title="Phase Cost Trend Analysis" className="shadow-lg">
                 {phaseData.length > 0 ? (
-                  <CostTrendChart data={phaseData} />
+                  <CostTrendChart data={phaseData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,7 +389,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               <Card title="Top 5 Expensive Items" className="shadow-lg">
                 {itemData.length > 0 ? (
-                  <ItemCostHorizontalChart data={itemData} />
+                  <ItemCostHorizontalChart data={itemData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,7 +402,7 @@ export default function Dashboard() {
 
               <Card title="Vendor Spend Distribution" className="shadow-lg">
                 {vendorData.length > 0 ? (
-                  <VendorSpendPieChart data={vendorData} />
+                  <VendorSpendPieChart data={vendorData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

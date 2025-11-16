@@ -59,6 +59,7 @@ const navItems = [
   { href: '/projects', label: 'Projects', icon: '/layers.ico' },
   { href: '/vendors', label: 'Vendors', icon: '/vendor.ico' },
   { href: '/reports', label: 'Reports', icon: '/report_1.ico' },
+  { href: '/settings/currency', label: 'Currency Settings', icon: '/user.ico' },
   { href: '/profile', label: 'Profile', icon: '/user.ico' },
 ];
 

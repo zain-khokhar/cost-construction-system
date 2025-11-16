@@ -28,7 +28,7 @@ export default function VendorSpendPieChart({ data }) {
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
-        <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+        <Tooltip formatter={(value) => `${getCurrencySymbol(currency)}${value.toLocaleString()}`} />
         <Legend />
       </PieChart>
     </ResponsiveContainer>

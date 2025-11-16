@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
 export default function PurchaseTab({ 
   purchases, 
@@ -19,6 +20,7 @@ export default function PurchaseTab({
   canCreateExpense, 
   permissionsLoading,
   pagination,
+  currency = 'USD',
   onToggleForm, 
   onFormChange, 
   onSubmit,
@@ -172,11 +174,11 @@ export default function PurchaseTab({
                     {purchase.quantity} {purchase.itemId?.unit || 'units'}
                   </td>
                   <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
-                    <span className="text-gray-700">${parseFloat(purchase.pricePerUnit).toFixed(2)}</span>
+                    <span className="text-gray-700">{getCurrencySymbol(currency)}{parseFloat(purchase.pricePerUnit).toFixed(2)}</span>
                   </td>
                   <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">
                     <span className="font-semibold text-green-600">
-                      ${purchase.totalCost.toLocaleString()}
+                      {getCurrencySymbol(currency)}{purchase.totalCost.toLocaleString()}
                     </span>
                   </td>
                   <td className="px-6 max-sm:p-2 py-4 border-r border-gray-200">

@@ -1,8 +1,9 @@
 'use client';
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
-export default function TopItemsBarChart({ data }) {
+export default function TopItemsBarChart({ data = [], currency = 'USD' }) {
   const chartData = data.map((item) => ({
     name: item._id,
     cost: item.totalCost,
@@ -14,7 +15,7 @@ export default function TopItemsBarChart({ data }) {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis type="number" />
         <YAxis dataKey="name" type="category" width={100} />
-        <Tooltip formatter={(value) => `$${value.toLocaleString()}`} />
+        <Tooltip formatter={(value) => `${getCurrencySymbol(currency)}${value.toLocaleString()}`} />
         <Bar dataKey="cost" fill="#10b981" />
       </BarChart>
     </ResponsiveContainer>

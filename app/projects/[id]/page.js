@@ -495,6 +495,7 @@ export default function ProjectDetailPage({ params }) {
           canCreateExpense={canCreateExpense}
           permissionsLoading={permissionsLoading}
           pagination={purchasesPagination}
+          currency={project?.currency}
           onToggleForm={() => toggleForm('purchases')}
           onFormChange={setFormData}
           onSubmit={handlePurchaseSubmit}

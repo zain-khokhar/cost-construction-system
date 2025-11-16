@@ -7,7 +7,9 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
+import CurrencySelect from '@/components/ui/CurrencySelect';
 import { usePermissions } from '@/lib/hooks/usePermissions';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
 export default function ProjectsPage() {
   const router = useRouter();
@@ -22,6 +24,7 @@ export default function ProjectsPage() {
     startDate: '',
     endDate: '',
     totalBudget: '',
+    currency: 'USD',
   });
   const [error, setError] = useState('');
   const [pagination, setPagination] = useState({
@@ -122,7 +125,7 @@ export default function ProjectsPage() {
         throw new Error(data.error?.message || `Failed to ${editingProject ? 'update' : 'create'} project`);
       }
 
-      setFormData({ name: '', client: '', location: '', startDate: '', endDate: '', totalBudget: '' });
+      setFormData({ name: '', client: '', location: '', startDate: '', endDate: '', totalBudget: '', currency: 'USD' });
       setShowForm(false);
       setEditingProject(null);
       fetchProjects();
@@ -140,6 +143,7 @@ export default function ProjectsPage() {
       startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
       endDate: project.endDate ? new Date(project.endDate).toISOString().split('T')[0] : '',
       totalBudget: project.totalBudget,
+      currency: project.currency || 'USD',
     });
     setShowForm(true);
   };
@@ -164,7 +168,7 @@ export default function ProjectsPage() {
 
   const handleCancelEdit = () => {
     setEditingProject(null);
-    setFormData({ name: '', client: '', location: '', startDate: '', endDate: '', totalBudget: '' });
+    setFormData({ name: '', client: '', location: '', startDate: '', endDate: '', totalBudget: '', currency: 'USD' });
     setShowForm(false);
     setError('');
   };
@@ -241,6 +245,15 @@ export default function ProjectsPage() {
                     placeholder="0.00"
                     min="0"
                     step="0.01"
+                  />
+                </div>
+                <div className="sm:col-span-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Currency
+                  </label>
+                  <CurrencySelect
+                    value={formData.currency}
+                    onChange={(value) => setFormData({ ...formData, currency: value })}
                   />
                 </div>
                 <div className="sm:col-span-2 lg:col-span-3">

@@ -13,6 +13,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
 ChartJS.register(
   CategoryScale,
@@ -25,7 +26,7 @@ ChartJS.register(
   Filler
 );
 
-export default function CostTrendChart({ data }) {
+export default function CostTrendChart({ data, currency = 'USD' }) {
   const chartData = useMemo(() => ({
     labels: data.map((item) => item.phaseName || item.name),
     datasets: [
@@ -80,7 +81,7 @@ export default function CostTrendChart({ data }) {
       tooltip: {
         callbacks: {
           label: function (context) {
-            return 'Cost: $' + context.parsed.y.toLocaleString();
+            return 'Cost: ' + getCurrencySymbol(currency) + context.parsed.y.toLocaleString();
           },
         },
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -95,7 +96,7 @@ export default function CostTrendChart({ data }) {
         beginAtZero: true,
         ticks: {
           callback: function (value) {
-            return '$' + value.toLocaleString();
+            return getCurrencySymbol(currency) + value.toLocaleString();
           },
           font: { size: 11 },
         },

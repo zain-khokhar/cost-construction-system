@@ -193,6 +193,7 @@ export default function ReportsPage() {
           totalRecords={pagination.totalItems}
           projectBudgets={summary.projectBudgets}
           hasProjectFilter={!!filters.projectId}
+          currency={summary.projectBudgets?.[0]?.currency || 'USD'}
         />
       </div>
 
