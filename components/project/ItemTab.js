@@ -32,7 +32,7 @@ export default function ItemTab({
   return (
     <>
       {canCreate && !permissionsLoading && (
-        <Button onClick={onToggleForm} className="mb-4">
+        <Button onClick={onToggleForm} className="mb-4 mx-4">
           {showForm ? 'Cancel' : '+ Add Item'}
         </Button>
       )}

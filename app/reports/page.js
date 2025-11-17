@@ -9,6 +9,7 @@ import ExportModal from '@/components/ui/ExportModal';
 import ReportsFilters from '@/components/reports/ReportsFilters';
 import ReportsSummary from '@/components/reports/ReportsSummary';
 import { useReportsData } from '@/lib/hooks/useReportsData';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 import { format } from 'date-fns';
 
 export default function ReportsPage() {
@@ -126,8 +127,8 @@ export default function ReportsPage() {
       <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.categoryId?.name || 'N/A'}</td>
       <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.itemId?.name || 'N/A'}</td>
       <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.quantity || 0} {purchase.itemId?.unit || ''}</td>
-      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">${(purchase.pricePerUnit || 0).toLocaleString()}</td>
-      <td className="px-3 md:px-6 py-3 md:py-4 font-medium text-sm md:text-base">${(purchase.totalCost || 0).toLocaleString()}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{getCurrencySymbol(purchase.projectId?.currency || 'USD')}{(purchase.pricePerUnit || 0).toLocaleString()}</td>
+      <td className="px-3 md:px-6 py-3 md:py-4 font-medium text-sm md:text-base">{getCurrencySymbol(purchase.projectId?.currency || 'USD')}{(purchase.totalCost || 0).toLocaleString()}</td>
       <td className="px-3 md:px-6 py-3 md:py-4 text-sm md:text-base">{purchase.vendorId?.name || 'N/A'}</td>
     </>
   ), [selectedPurchases, handleSelectPurchase]);
@@ -144,6 +145,23 @@ export default function ReportsPage() {
     [selectedPurchases.length]
   );
 
+  // Calculate the correct currency based on filters and data
+  const getCurrentCurrency = useMemo(() => {
+    // If filtering by specific project, use that project's currency
+    if (filters.projectId && projects.length > 0) {
+      const selectedProject = projects.find(p => p._id === filters.projectId);
+      return selectedProject?.currency || 'USD';
+    }
+    
+    // If we have project budgets, use the first one's currency
+    if (summary.projectBudgets && summary.projectBudgets.length > 0) {
+      return summary.projectBudgets[0].currency || 'USD';
+    }
+    
+    // Default to USD
+    return 'USD';
+  }, [filters.projectId, projects, summary.projectBudgets]);
+
   // Memoized selected count text
   const selectedCountText = useMemo(() => 
     selectAll ? `All ${pagination.totalItems} items selected` : `${selectedPurchases.length} selected`,
@@ -153,7 +171,7 @@ export default function ReportsPage() {
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
-        <h2 className="text-xl md:text-2xl font-bold">Reports</h2>
+        <h2 className="text-xl md:text-2xl font-bold pl-8">Reports</h2>
         <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full sm:w-auto">
           {selectedPurchases.length > 0 && (
             <div className="flex items-center px-3 md:px-4 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm md:text-base">
@@ -193,7 +211,7 @@ export default function ReportsPage() {
           totalRecords={pagination.totalItems}
           projectBudgets={summary.projectBudgets}
           hasProjectFilter={!!filters.projectId}
-          currency={summary.projectBudgets?.[0]?.currency || 'USD'}
+          currency={getCurrentCurrency}
         />
       </div>
 

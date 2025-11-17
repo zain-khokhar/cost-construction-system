@@ -49,26 +49,6 @@ export default function PurchaseDetailModal({
                 <Package className="w-4 h-4" />
                 Invoice Document
               </h3>
-              <div className="relative group">
-                {/* <div className="bg-gray-100 rounded-lg border p-4">
-                  <img
-                    src={purchase.invoiceUrl}
-                    alt="Invoice"
-                    className="w-full max-h-96 object-contain rounded-lg cursor-pointer hover:opacity-90 transition-opacity bg-white shadow-sm"
-                    onClick={handleImageClick}
-                    onError={(e) => {
-                      e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTkgMTJMMTEgMTRMMTUgMTBNMjEgMTJDMjEgMTYuOTcwNiAxNi45NzA2IDIxIDEyIDIxQzcuMDI5NCAyMSAzIDE2Ljk3MDYgMyAxMkMzIDcuMDI5NCA3LjAyOTQgMyAxMiAzQzE2Ljk3MDYgMyAyMSA3LjAyOTQgMjEgMTJaIiBzdHJva2U9IiM2QjcyODAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPgo=';
-                      e.target.alt = 'Image failed to load';
-                    }}
-                  />
-                </div> */}
-                {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
-                  <Download className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div> */}
-                {/* <div className="absolute top-2 right-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">
-                  Click to view full size
-                </div> */}
-              </div>
             </div>
           )}
 

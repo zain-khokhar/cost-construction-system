@@ -102,10 +102,25 @@ export default function Navbar() {
   return (
     <header className="bg-white border-b border-gray-200 px-3 md:px-6 py-3 md:py-4 sticky top-0 z-20">
       <div className="flex justify-between items-center">
-        <h1 className="text-base md:text-xl font-bold text-gray-900 ml-12 lg:ml-0 truncate">
-          <span className="ml-10 hidden sm:inline">Construction Cost Management</span>
-          <span className="sm:hidden">CCM</span>
-        </h1>
+        {/* Logo Section */}
+        <div className="flex items-center gap-3 ml-12 lg:ml-0">
+          <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-xl shadow-lg">
+            <svg className="w-6 h-6 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-lg md:text-xl font-bold text-gray-900 leading-tight">
+              <span className="hidden sm:inline bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                ConstructPro
+              </span>
+              <span className="sm:hidden bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                CP
+              </span>
+            </h1>
+            <p className="text-xs text-gray-500 leading-none hidden md:block">Cost Management System</p>
+          </div>
+        </div>
         <div className="flex items-center gap-2 md:gap-4">
           {user && (
             <>

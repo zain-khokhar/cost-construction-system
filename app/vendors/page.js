@@ -7,6 +7,7 @@ import Input from '@/components/ui/Input';
 import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import { usePermissions } from '@/lib/hooks/usePermissions';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
 export default function VendorsPage() {
   const { canCreate, loading: permissionsLoading } = usePermissions();
@@ -30,10 +31,12 @@ export default function VendorsPage() {
   const [selectedVendors, setSelectedVendors] = useState([]);
   const [editingVendor, setEditingVendor] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [companyCurrency, setCompanyCurrency] = useState('USD');
 
   useEffect(() => {
     fetchVendors();
     fetchVendorSpend();
+    fetchCompanySettings();
   }, [pagination.currentPage, pagination.itemsPerPage]);
 
   const handleSelectAll = (checked) => {
@@ -77,6 +80,18 @@ export default function VendorsPage() {
       if (data.ok) setVendorSpend(data.data.vendorSpend);
     } catch (err) {
       console.error('Failed to fetch vendor spend:', err);
+    }
+  };
+
+  const fetchCompanySettings = async () => {
+    try {
+      const res = await fetch('/api/companies/settings');
+      const data = await res.json();
+      if (data.ok && data.data) {
+        setCompanyCurrency(data.data.defaultCurrency || 'USD');
+      }
+    } catch (err) {
+      console.error('Failed to fetch company settings:', err);
     }
   };
 
@@ -155,7 +170,7 @@ export default function VendorsPage() {
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
-        <h2 className="text-xl md:text-2xl font-bold">Vendors</h2>
+        <h2 className="text-xl md:text-2xl font-bold pl-8 py-4">Vendors</h2>
         {canCreate && !permissionsLoading && (
           <Button onClick={() => setShowForm(!showForm)} className="w-full sm:w-auto">
             {showForm ? 'Cancel' : 'New Vendor'}
@@ -208,7 +223,7 @@ export default function VendorsPage() {
           )}
 
           {deleteConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
               <Card className="max-w-md">
                 <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
                 <p className="text-gray-600 mb-6">
@@ -266,7 +281,7 @@ export default function VendorsPage() {
                       <td className="px-6 py-4">{vendor.address || 'N/A'}</td>
                       <td className="px-6 py-4">{vendor.rating || 'N/A'}</td>
                       <td className="px-6 py-4 font-medium">
-                        ${getVendorSpend(vendor._id).toLocaleString()}
+                        {getCurrencySymbol(companyCurrency)}{getVendorSpend(vendor._id).toLocaleString()}
                       </td>
                       {canCreate && (
                         <td className="px-6 py-4">

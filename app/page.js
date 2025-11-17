@@ -7,6 +7,7 @@ import BudgetProgressChart from '@/components/charts/BudgetProgressChart';
 import CostTrendChart from '@/components/charts/CostTrendChart';
 import ItemCostHorizontalChart from '@/components/charts/ItemCostHorizontalChart';
 import VendorSpendPieChart from '@/components/charts/VendorSpendPieChart';
+import { getCurrencySymbol } from '@/lib/utils/currencies';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -120,6 +121,33 @@ export default function Dashboard() {
       : 0;
   }, [budgetData, summaryStats]);
 
+  // Get current currency based on selected project
+  const currentCurrency = useMemo(() => {
+    if (selectedProject && projects.length > 0) {
+      const project = projects.find(p => p._id === selectedProject);
+      return project?.currency || 'USD';
+    }
+    // If no project selected, use first project's currency or USD
+    return projects[0]?.currency || 'USD';
+  }, [selectedProject, projects]);
+
+  // Format currency with K, M, B abbreviations for better responsive design
+  const formatCurrencyCompact = useCallback((amount, currency = 'USD') => {
+    const symbol = getCurrencySymbol(currency);
+    const absAmount = Math.abs(amount);
+    const sign = amount < 0 ? '-' : '';
+    
+    if (absAmount >= 1000000000) {
+      return `${sign}${symbol}${(absAmount / 1000000000).toFixed(1)}B`;
+    } else if (absAmount >= 1000000) {
+      return `${sign}${symbol}${(absAmount / 1000000).toFixed(1)}M`;
+    } else if (absAmount >= 1000) {
+      return `${sign}${symbol}${(absAmount / 1000).toFixed(1)}K`;
+    } else {
+      return `${sign}${symbol}${absAmount.toLocaleString()}`;
+    }
+  }, []);
+
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Header with Filter */}
@@ -178,7 +206,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-black text-xs md:text-sm font-medium mb-1">Total Budget</p>
-                  <h3 className="text-2xl text-black md:text-3xl font-bold">${summaryStats.totalBudget.toLocaleString()}</h3>
+                  <h3 className="text-2xl text-black md:text-3xl font-bold">{formatCurrencyCompact(summaryStats.totalBudget, currentCurrency)}</h3>
                 </div>
                 <div className="bg-blue-900 bg-opacity-30 p-3 md:p-4 rounded-full">
                   <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,7 +220,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-black text-xs md:text-sm font-medium mb-1">Total Spent</p>
-                  <h3 className="text-2xl md:text-3xl font-bold text-black">${summaryStats.totalSpent.toLocaleString()}</h3>
+                  <h3 className="text-2xl md:text-3xl font-bold text-black">{formatCurrencyCompact(summaryStats.totalSpent, currentCurrency)}</h3>
                 </div>
                 <div className="bg-blue-900 bg-opacity-30 p-3 md:p-4 rounded-full">
                   <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +234,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`${summaryStats.totalRemaining >= 0 ? 'text-black' : 'text-red-100'} text-xs md:text-sm font-medium mb-1`}>Remaining</p>
-                  <h3 className="text-2xl md:text-3xl font-bold text-black">${summaryStats.totalRemaining.toLocaleString()}</h3>
+                  <h3 className="text-2xl md:text-3xl font-bold text-black">{formatCurrencyCompact(summaryStats.totalRemaining, currentCurrency)}</h3>
                 </div>
                 <div className={`${summaryStats.totalRemaining >= 0 ? 'bg-blue-900' : 'bg-red-400'} bg-opacity-30 p-3 md:p-4 rounded-full`}>
                   <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,11 +289,11 @@ export default function Dashboard() {
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                       <span className="text-gray-600 font-medium">Budget:</span>
-                      <span className="font-bold text-gray-900">${project.budget.toLocaleString()}</span>
+                      <span className="font-bold text-gray-900">{formatCurrencyCompact(project.budget, currentCurrency)}</span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                       <span className="text-gray-600 font-medium">Spent:</span>
-                      <span className="font-bold text-gray-900">${project.spent.toLocaleString()}</span>
+                      <span className="font-bold text-gray-900">{formatCurrencyCompact(project.spent, currentCurrency)}</span>
                     </div>
                     <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
                       <span className="text-gray-600 font-medium">Remaining:</span>
@@ -274,7 +302,7 @@ export default function Dashboard() {
                           project.remaining < 0 ? 'text-red-600' : 'text-green-600'
                         }`}
                       >
-                        ${project.remaining.toLocaleString()}
+                        {formatCurrencyCompact(project.remaining, currentCurrency)}
                       </span>
                     </div>
                     <div className="pt-3 border-t-2 border-gray-200">
@@ -318,7 +346,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
               <Card title="Budget vs Actual Spending" className="shadow-lg">
                 {budgetData.length > 0 ? (
-                  <BudgetProgressChart data={budgetData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
+                  <BudgetProgressChart data={budgetData} currency={currentCurrency} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -342,16 +370,16 @@ export default function Dashboard() {
                       <div className="space-y-4">
                         <div className="flex justify-between items-center p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
                           <span className="text-gray-700 font-medium">Spent</span>
-                          <span className="text-green-700 font-bold text-lg">${summaryStats.totalSpent.toLocaleString()}</span>
+                          <span className="text-green-700 font-bold text-lg">{formatCurrencyCompact(summaryStats.totalSpent, currentCurrency)}</span>
                         </div>
                         <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
                           <span className="text-gray-700 font-medium">Remaining</span>
-                          <span className="text-blue-700 font-bold text-lg">${summaryStats.totalRemaining.toLocaleString()}</span>
+                          <span className="text-blue-700 font-bold text-lg">{formatCurrencyCompact(summaryStats.totalRemaining, currentCurrency)}</span>
                         </div>
                         {summaryStats.totalSpent > summaryStats.totalBudget && (
                           <div className="flex justify-between items-center p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
                             <span className="text-gray-700 font-medium">Over Budget</span>
-                            <span className="text-red-700 font-bold text-lg">${(summaryStats.totalSpent - summaryStats.totalBudget).toLocaleString()}</span>
+                            <span className="text-red-700 font-bold text-lg">{formatCurrencyCompact(summaryStats.totalSpent - summaryStats.totalBudget, currentCurrency)}</span>
                           </div>
                         )}
                       </div>
@@ -373,7 +401,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 gap-4 md:gap-6 mb-4 md:mb-6">
               <Card title="Phase Cost Trend Analysis" className="shadow-lg">
                 {phaseData.length > 0 ? (
-                  <CostTrendChart data={phaseData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
+                  <CostTrendChart data={phaseData} currency={currentCurrency} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,7 +417,7 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               <Card title="Top 5 Expensive Items" className="shadow-lg">
                 {itemData.length > 0 ? (
-                  <ItemCostHorizontalChart data={itemData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
+                  <ItemCostHorizontalChart data={itemData} currency={currentCurrency} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,7 +430,7 @@ export default function Dashboard() {
 
               <Card title="Vendor Spend Distribution" className="shadow-lg">
                 {vendorData.length > 0 ? (
-                  <VendorSpendPieChart data={vendorData} currency={selectedProject ? projects.find(p => p._id === selectedProject)?.currency : 'USD'} />
+                  <VendorSpendPieChart data={vendorData} currency={currentCurrency} />
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                     <svg className="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
