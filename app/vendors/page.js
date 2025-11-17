@@ -223,7 +223,7 @@ export default function VendorsPage() {
           )}
 
           {deleteConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center z-50">
               <Card className="max-w-md">
                 <h3 className="text-lg font-semibold mb-4">Confirm Delete</h3>
                 <p className="text-gray-600 mb-6">
