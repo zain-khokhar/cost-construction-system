@@ -437,7 +437,7 @@ export default function ProjectsPage() {
                         </div>
                         <div>
                           <span className="text-gray-500">Budget:</span>
-                          <p className="font-medium">${project.totalBudget.toLocaleString()}</p>
+                          <p className="font-medium">{getCurrencySymbol(project.currency || 'USD')}{project.totalBudget.toLocaleString()}</p>
                         </div>
                         <div className="col-span-2">
                           <span className="text-gray-500">Start Date:</span>
@@ -514,7 +514,7 @@ export default function ProjectsPage() {
                     <td className="px-6 py-4 font-medium text-gray-900">{project.name}</td>
                     <td className="px-6 py-4 text-gray-600">{project.client}</td>
                     <td className="px-6 py-4 text-gray-600">{project.location || 'N/A'}</td>
-                    <td className="px-6 py-4 font-medium text-gray-900">${project.totalBudget.toLocaleString()}</td>
+                    <td className="px-6 py-4 font-medium text-gray-900">{getCurrencySymbol(project.currency || 'USD')}{project.totalBudget.toLocaleString()}</td>
                     <td className="px-6 py-4">
                       {canCreate ? (
                         <select

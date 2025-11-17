@@ -30,7 +30,7 @@ export default function PhaseTab({
   return (
     <>
       {canCreate && !permissionsLoading && (
-        <Button onClick={onToggleForm} className="mb-4">
+        <Button onClick={onToggleForm} className="mb-4 mx-2">
           {showForm ? 'Cancel' : '+ Add Phase'}
         </Button>
       )}

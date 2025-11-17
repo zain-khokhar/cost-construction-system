@@ -58,7 +58,7 @@ async function getPurchases(request) {
     .populate('itemId', 'name unit')
     .populate('categoryId', 'name')
     .populate('phaseId', 'name')
-    .populate('projectId', 'name totalBudget')
+    .populate('projectId', 'name totalBudget currency')
     .populate('vendorId', 'name')
     .populate('createdBy', 'name')
     .sort({ purchaseDate: -1 });

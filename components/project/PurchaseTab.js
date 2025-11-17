@@ -58,7 +58,7 @@ export default function PurchaseTab({
   return (
     <>
       {canCreateExpense && !permissionsLoading && (
-        <Button onClick={onToggleForm} className="mb-4">
+        <Button onClick={onToggleForm} className="mb-4 mx-4">
           {showForm ? 'Cancel' : '+ Log Purchase'}
         </Button>
       )}

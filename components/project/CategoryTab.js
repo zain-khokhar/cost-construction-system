@@ -31,7 +31,7 @@ export default function CategoryTab({
   return (
     <>
       {canCreate && !permissionsLoading && (
-        <Button onClick={onToggleForm} className="mb-4">
+        <Button onClick={onToggleForm} className="mb-4 mx-4">
           {showForm ? 'Cancel' : '+ Add Category'}
         </Button>
       )}
